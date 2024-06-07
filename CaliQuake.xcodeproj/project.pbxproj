@@ -1,0 +1,596 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CD03116A2C135C620076443C /* CaliQuakeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0311692C135C620076443C /* CaliQuakeApp.swift */; };
+		CD03116C2C135C620076443C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD03116B2C135C620076443C /* ContentView.swift */; };
+		CD03116E2C135C620076443C /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD03116D2C135C620076443C /* Item.swift */; };
+		CD0311702C135C630076443C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD03116F2C135C630076443C /* Assets.xcassets */; };
+		CD0311732C135C630076443C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD0311722C135C630076443C /* Preview Assets.xcassets */; };
+		CD03117E2C135C630076443C /* CaliQuakeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD03117D2C135C630076443C /* CaliQuakeTests.swift */; };
+		CD0311882C135C630076443C /* CaliQuakeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0311872C135C630076443C /* CaliQuakeUITests.swift */; };
+		CD03118A2C135C630076443C /* CaliQuakeUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0311892C135C630076443C /* CaliQuakeUITestsLaunchTests.swift */; };
+		CD0311972C135DAD0076443C /* CaliMenuExtra.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0311962C135DAD0076443C /* CaliMenuExtra.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CD03117A2C135C630076443C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD03115E2C135C620076443C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CD0311652C135C620076443C;
+			remoteInfo = CaliQuake;
+		};
+		CD0311842C135C630076443C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD03115E2C135C620076443C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CD0311652C135C620076443C;
+			remoteInfo = CaliQuake;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		CD0311662C135C620076443C /* CaliQuake.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaliQuake.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD0311692C135C620076443C /* CaliQuakeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaliQuakeApp.swift; sourceTree = "<group>"; };
+		CD03116B2C135C620076443C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		CD03116D2C135C620076443C /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		CD03116F2C135C630076443C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CD0311722C135C630076443C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		CD0311742C135C630076443C /* CaliQuake.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CaliQuake.entitlements; sourceTree = "<group>"; };
+		CD0311792C135C630076443C /* CaliQuakeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaliQuakeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD03117D2C135C630076443C /* CaliQuakeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaliQuakeTests.swift; sourceTree = "<group>"; };
+		CD0311832C135C630076443C /* CaliQuakeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaliQuakeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD0311872C135C630076443C /* CaliQuakeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaliQuakeUITests.swift; sourceTree = "<group>"; };
+		CD0311892C135C630076443C /* CaliQuakeUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaliQuakeUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		CD0311962C135DAD0076443C /* CaliMenuExtra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaliMenuExtra.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CD0311632C135C620076443C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD0311762C135C630076443C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD0311802C135C630076443C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CD03115D2C135C620076443C = {
+			isa = PBXGroup;
+			children = (
+				CD0311682C135C620076443C /* CaliQuake */,
+				CD03117C2C135C630076443C /* CaliQuakeTests */,
+				CD0311862C135C630076443C /* CaliQuakeUITests */,
+				CD0311672C135C620076443C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CD0311672C135C620076443C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CD0311662C135C620076443C /* CaliQuake.app */,
+				CD0311792C135C630076443C /* CaliQuakeTests.xctest */,
+				CD0311832C135C630076443C /* CaliQuakeUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD0311682C135C620076443C /* CaliQuake */ = {
+			isa = PBXGroup;
+			children = (
+				CD0311692C135C620076443C /* CaliQuakeApp.swift */,
+				CD03116B2C135C620076443C /* ContentView.swift */,
+				CD03116D2C135C620076443C /* Item.swift */,
+				CD03116F2C135C630076443C /* Assets.xcassets */,
+				CD0311742C135C630076443C /* CaliQuake.entitlements */,
+				CD0311712C135C630076443C /* Preview Content */,
+				CD0311962C135DAD0076443C /* CaliMenuExtra.swift */,
+			);
+			path = CaliQuake;
+			sourceTree = "<group>";
+		};
+		CD0311712C135C630076443C /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				CD0311722C135C630076443C /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		CD03117C2C135C630076443C /* CaliQuakeTests */ = {
+			isa = PBXGroup;
+			children = (
+				CD03117D2C135C630076443C /* CaliQuakeTests.swift */,
+			);
+			path = CaliQuakeTests;
+			sourceTree = "<group>";
+		};
+		CD0311862C135C630076443C /* CaliQuakeUITests */ = {
+			isa = PBXGroup;
+			children = (
+				CD0311872C135C630076443C /* CaliQuakeUITests.swift */,
+				CD0311892C135C630076443C /* CaliQuakeUITestsLaunchTests.swift */,
+			);
+			path = CaliQuakeUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CD0311652C135C620076443C /* CaliQuake */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CD03118D2C135C630076443C /* Build configuration list for PBXNativeTarget "CaliQuake" */;
+			buildPhases = (
+				CD0311622C135C620076443C /* Sources */,
+				CD0311632C135C620076443C /* Frameworks */,
+				CD0311642C135C620076443C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CaliQuake;
+			productName = CaliQuake;
+			productReference = CD0311662C135C620076443C /* CaliQuake.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CD0311782C135C630076443C /* CaliQuakeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CD0311902C135C630076443C /* Build configuration list for PBXNativeTarget "CaliQuakeTests" */;
+			buildPhases = (
+				CD0311752C135C630076443C /* Sources */,
+				CD0311762C135C630076443C /* Frameworks */,
+				CD0311772C135C630076443C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CD03117B2C135C630076443C /* PBXTargetDependency */,
+			);
+			name = CaliQuakeTests;
+			productName = CaliQuakeTests;
+			productReference = CD0311792C135C630076443C /* CaliQuakeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CD0311822C135C630076443C /* CaliQuakeUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CD0311932C135C630076443C /* Build configuration list for PBXNativeTarget "CaliQuakeUITests" */;
+			buildPhases = (
+				CD03117F2C135C630076443C /* Sources */,
+				CD0311802C135C630076443C /* Frameworks */,
+				CD0311812C135C630076443C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CD0311852C135C630076443C /* PBXTargetDependency */,
+			);
+			name = CaliQuakeUITests;
+			productName = CaliQuakeUITests;
+			productReference = CD0311832C135C630076443C /* CaliQuakeUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CD03115E2C135C620076443C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					CD0311652C135C620076443C = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					CD0311782C135C630076443C = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = CD0311652C135C620076443C;
+					};
+					CD0311822C135C630076443C = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = CD0311652C135C620076443C;
+					};
+				};
+			};
+			buildConfigurationList = CD0311612C135C620076443C /* Build configuration list for PBXProject "CaliQuake" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CD03115D2C135C620076443C;
+			productRefGroup = CD0311672C135C620076443C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CD0311652C135C620076443C /* CaliQuake */,
+				CD0311782C135C630076443C /* CaliQuakeTests */,
+				CD0311822C135C630076443C /* CaliQuakeUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CD0311642C135C620076443C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD0311732C135C630076443C /* Preview Assets.xcassets in Resources */,
+				CD0311702C135C630076443C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD0311772C135C630076443C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD0311812C135C630076443C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CD0311622C135C620076443C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD0311972C135DAD0076443C /* CaliMenuExtra.swift in Sources */,
+				CD03116C2C135C620076443C /* ContentView.swift in Sources */,
+				CD03116E2C135C620076443C /* Item.swift in Sources */,
+				CD03116A2C135C620076443C /* CaliQuakeApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD0311752C135C630076443C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD03117E2C135C630076443C /* CaliQuakeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD03117F2C135C630076443C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD0311882C135C630076443C /* CaliQuakeUITests.swift in Sources */,
+				CD03118A2C135C630076443C /* CaliQuakeUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CD03117B2C135C630076443C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CD0311652C135C620076443C /* CaliQuake */;
+			targetProxy = CD03117A2C135C630076443C /* PBXContainerItemProxy */;
+		};
+		CD0311852C135C630076443C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CD0311652C135C620076443C /* CaliQuake */;
+			targetProxy = CD0311842C135C630076443C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CD03118B2C135C630076443C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CD03118C2C135C630076443C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		CD03118E2C135C630076443C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CaliQuake/CaliQuake.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"CaliQuake/Preview Content\"";
+				DEVELOPMENT_TEAM = HNA3JW5W4B;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.joeyshapiro.CaliQuake;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		CD03118F2C135C630076443C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CaliQuake/CaliQuake.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"CaliQuake/Preview Content\"";
+				DEVELOPMENT_TEAM = HNA3JW5W4B;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.joeyshapiro.CaliQuake;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		CD0311912C135C630076443C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HNA3JW5W4B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.joeyshapiro.CaliQuakeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CaliQuake.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CaliQuake";
+			};
+			name = Debug;
+		};
+		CD0311922C135C630076443C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HNA3JW5W4B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.joeyshapiro.CaliQuakeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CaliQuake.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CaliQuake";
+			};
+			name = Release;
+		};
+		CD0311942C135C630076443C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HNA3JW5W4B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.joeyshapiro.CaliQuakeUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = CaliQuake;
+			};
+			name = Debug;
+		};
+		CD0311952C135C630076443C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HNA3JW5W4B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.joeyshapiro.CaliQuakeUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = CaliQuake;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CD0311612C135C620076443C /* Build configuration list for PBXProject "CaliQuake" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD03118B2C135C630076443C /* Debug */,
+				CD03118C2C135C630076443C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CD03118D2C135C630076443C /* Build configuration list for PBXNativeTarget "CaliQuake" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD03118E2C135C630076443C /* Debug */,
+				CD03118F2C135C630076443C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CD0311902C135C630076443C /* Build configuration list for PBXNativeTarget "CaliQuakeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD0311912C135C630076443C /* Debug */,
+				CD0311922C135C630076443C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CD0311932C135C630076443C /* Build configuration list for PBXNativeTarget "CaliQuakeUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD0311942C135C630076443C /* Debug */,
+				CD0311952C135C630076443C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CD03115E2C135C620076443C /* Project object */;
+}
