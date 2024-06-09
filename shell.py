@@ -65,11 +65,20 @@ def write(fd):
     # oh, same with input
     os.write(fd, to_write.pop().encode())
 
-pty.spawn(['zsh'], read)
+# good, but uses current stdio
+# pty.spawn(['bash'], read, write)
+# just gives you a consumer and producer
+# its pretty basic
+master, slave = os.openpty()
+
+os.close(master)
+os.close(slave)
+
 
 print('-' * 80)
 with open('output.txt', 'wb') as f:
     for output in output_bytes:
         f.write(output)
         print(output.decode('utf-8'))
+print(did_run)
 print('-' * 80)
