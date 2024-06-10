@@ -11,9 +11,12 @@ def read_from_pty(master_fd):
         if master_fd in r:
             try:
                 output = os.read(master_fd, 1024)
-                if not output:
-                    break
                 print(output.decode('utf-8'), end='')
+                if b'EndPrompt' in output:
+                    break
+                if not output:
+                    print("EOF")
+                    break
             except OSError:
                 break
 
@@ -47,9 +50,9 @@ def main():
                 write_to_pty(master_fd, command)
                 # Allow some time for the command to be executed and output to be read
                 time.sleep(1)
+                # Read the output from the PTY
+                read_from_pty(master_fd)
 
-            # Read the output from the PTY
-            read_from_pty(master_fd)
 
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt received, closing...")
