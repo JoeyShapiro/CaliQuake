@@ -4,6 +4,8 @@ import signal
 import time
 import select
 
+SHELL = 'bash'
+
 def read_from_pty(master_fd):
     """Read output from the master side of the PTY and print it."""
     while True:
@@ -31,7 +33,7 @@ def main():
     if pid == 0:
         # Child process
         # Replace the child process with the bash shell
-        os.execlp('bash', 'bash')
+        os.execlp(SHELL, SHELL)
     else:
         # Parent process
         try:
@@ -60,4 +62,6 @@ def main():
             os.close(master_fd)
 
 if __name__ == "__main__":
+    print('-'*80)
     main()
+    print('-'*80)
