@@ -14,14 +14,17 @@ func runBash() {
     var pipeFDs: [Int32] = [0, 0] // [read, write]
     pipe(&pipeFDs)
     
+    // i got it!
     // Set up the file actions to map the write end of the pipe to the child's stdin
-    var s = posix_spawn_file_actions_adddup2(&fileActions, pipeFDs[1], STDIN_FILENO)
+    // the program READS from strdin
+    var s = posix_spawn_file_actions_adddup2(&fileActions, pipeFDs[0], STDIN_FILENO)
     print("posix_spawn_file_actions_adddup2: \(s)")
 
     // Set up another pipe to capture the child's stdout and stderr
     var outPipeFDs: [Int32] = [0, 0]
     pipe(&outPipeFDs)
-    s = posix_spawn_file_actions_adddup2(&fileActions, outPipeFDs[0], STDOUT_FILENO)
+    // the program WRITES to stdout
+    s = posix_spawn_file_actions_adddup2(&fileActions, outPipeFDs[1], STDOUT_FILENO)
     print("posix_spawn_file_actions_adddup2: \(s)")
     // posix_spawn_file_actions_adddup2(&fileActions, outPipeFDs[1], STDERR_FILENO)
     
@@ -44,9 +47,11 @@ func runBash() {
     // Write commands to the pipe
     let command1 = "echo 'Hello, World!'\n"
     let command2 = "ls -l\n"
+    let command3 = "exit\n"
     
     let commandData1 = command1.data(using: .utf8)!
     let commandData2 = command2.data(using: .utf8)!
+    let commandData3 = command3.data(using: .utf8)!
     
     commandData1.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
         let n = write(pipeFDs[1], ptr.baseAddress!, ptr.count)
@@ -57,6 +62,12 @@ func runBash() {
         let n = write(pipeFDs[1], ptr.baseAddress!, ptr.count)
         print("wrote \(n) bytes")
     }
+
+    commandData3.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
+        let n = write(pipeFDs[1], ptr.baseAddress!, ptr.count)
+        print("wrote \(n) bytes")
+    }
+
     close(outPipeFDs[1])
     
     // Read output from the spawned process
