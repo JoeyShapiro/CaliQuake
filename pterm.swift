@@ -11,17 +11,26 @@ func runBash() {
     posix_spawn_file_actions_init(&fileActions)
 
     // Set up a pipe to communicate with the spawned process
-    var pipeFDs: [Int32] = [0, 0]
+    var pipeFDs: [Int32] = [0, 0] // [read, write]
     pipe(&pipeFDs)
     
     // Set up the file actions to map the write end of the pipe to the child's stdin
-    posix_spawn_file_actions_adddup2(&fileActions, pipeFDs[1], STDIN_FILENO)
+    var s = posix_spawn_file_actions_adddup2(&fileActions, pipeFDs[1], STDIN_FILENO)
+    print("posix_spawn_file_actions_adddup2: \(s)")
+
+    // Set up another pipe to capture the child's stdout and stderr
+    var outPipeFDs: [Int32] = [0, 0]
+    pipe(&outPipeFDs)
+    s = posix_spawn_file_actions_adddup2(&fileActions, outPipeFDs[0], STDOUT_FILENO)
+    print("posix_spawn_file_actions_adddup2: \(s)")
+    // posix_spawn_file_actions_adddup2(&fileActions, outPipeFDs[1], STDERR_FILENO)
     
     defer {
         posix_spawn_file_actions_destroy(&fileActions)
         fileActions?.deallocate()
-        close(pipeFDs[0]) // Close the read end of the pipe
-        close(pipeFDs[1]) // Close the write end of the pipe
+        close(pipeFDs[0])
+        close(pipeFDs[1])
+        close(outPipeFDs[0]) // Close the read end of the output pipe
     }
     
     var pid: pid_t = 0
@@ -39,12 +48,34 @@ func runBash() {
     let commandData1 = command1.data(using: .utf8)!
     let commandData2 = command2.data(using: .utf8)!
     
-    _ = commandData1.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
-        write(pipeFDs[1], ptr.baseAddress!, ptr.count)
+    commandData1.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
+        let n = write(pipeFDs[1], ptr.baseAddress!, ptr.count)
+        print("wrote \(n) bytes")
     }
     
-    _ = commandData2.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
-        write(pipeFDs[1], ptr.baseAddress!, ptr.count)
+    commandData2.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
+        let n = write(pipeFDs[1], ptr.baseAddress!, ptr.count)
+        print("wrote \(n) bytes")
+    }
+    close(outPipeFDs[1])
+    
+    // Read output from the spawned process
+    var outputData = Data()
+    let bufferSize = 1024
+    var buffer = [UInt8](repeating: 0, count: bufferSize)
+    
+    var bytesRead = read(outPipeFDs[0], &buffer, bufferSize) // Use outPipeFDs[0] for reading
+    print("bytesRead: \(bytesRead)")
+    while bytesRead > 0 {
+        outputData.append(buffer, count: bytesRead)
+        bytesRead = read(outPipeFDs[0], &buffer, bufferSize) // Use outPipeFDs[0] for reading
+        print("bytesRead: \(bytesRead)")
+    }
+    
+    if let output = String(data: outputData, encoding: .utf8) {
+        print("Output from Bash:\n\(output)")
+    } else {
+        print("Error decoding output data")
     }
     
     var status: Int32 = 0
@@ -54,4 +85,3 @@ func runBash() {
 print("starting...")
 runBash()
 print("done")
-
