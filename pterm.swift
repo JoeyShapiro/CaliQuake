@@ -81,12 +81,12 @@ func runBash() {
         outputData.append(buffer, count: bytesRead)
         bytesRead = read(outPipeFDs[0], &buffer, bufferSize) // Use outPipeFDs[0] for reading
         print("bytesRead: \(bytesRead)")
-    }
-    
-    if let output = String(data: outputData, encoding: .utf8) {
-        print("Output from Bash:\n\(output)")
-    } else {
-        print("Error decoding output data")
+
+        if let output = String(data: outputData, encoding: .utf8) {
+            print("Output from Bash:\n\(output)")
+        } else {
+            print("Error decoding output data")
+        }
     }
     
     var status: Int32 = 0
