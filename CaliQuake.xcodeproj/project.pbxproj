@@ -16,7 +16,8 @@
 		CD0311882C135C630076443C /* CaliQuakeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0311872C135C630076443C /* CaliQuakeUITests.swift */; };
 		CD03118A2C135C630076443C /* CaliQuakeUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0311892C135C630076443C /* CaliQuakeUITestsLaunchTests.swift */; };
 		CD0311972C135DAD0076443C /* CaliMenuExtra.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0311962C135DAD0076443C /* CaliMenuExtra.swift */; };
-		CD3089252C16822B00FD5F84 /* pterm.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3089242C16822B00FD5F84 /* pterm.swift */; };
+		CD3089272C1A755700FD5F84 /* TextureRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3089262C1A755700FD5F84 /* TextureRenderer.swift */; };
+		CD3089692C1A928C00FD5F84 /* starter.metal in Sources */ = {isa = PBXBuildFile; fileRef = CD3089682C1A928C00FD5F84 /* starter.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,7 +51,8 @@
 		CD0311872C135C630076443C /* CaliQuakeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaliQuakeUITests.swift; sourceTree = "<group>"; };
 		CD0311892C135C630076443C /* CaliQuakeUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaliQuakeUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		CD0311962C135DAD0076443C /* CaliMenuExtra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaliMenuExtra.swift; sourceTree = "<group>"; };
-		CD3089242C16822B00FD5F84 /* pterm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = pterm.swift; sourceTree = "<group>"; };
+		CD3089262C1A755700FD5F84 /* TextureRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureRenderer.swift; sourceTree = "<group>"; };
+		CD3089682C1A928C00FD5F84 /* starter.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = starter.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,7 +83,6 @@
 		CD03115D2C135C620076443C = {
 			isa = PBXGroup;
 			children = (
-				CD3089242C16822B00FD5F84 /* pterm.swift */,
 				CD0311682C135C620076443C /* CaliQuake */,
 				CD03117C2C135C630076443C /* CaliQuakeTests */,
 				CD0311862C135C630076443C /* CaliQuakeUITests */,
@@ -109,6 +110,8 @@
 				CD0311742C135C630076443C /* CaliQuake.entitlements */,
 				CD0311712C135C630076443C /* Preview Content */,
 				CD0311962C135DAD0076443C /* CaliMenuExtra.swift */,
+				CD3089262C1A755700FD5F84 /* TextureRenderer.swift */,
+				CD3089682C1A928C00FD5F84 /* starter.metal */,
 			);
 			path = CaliQuake;
 			sourceTree = "<group>";
@@ -270,9 +273,10 @@
 			files = (
 				CD0311972C135DAD0076443C /* CaliMenuExtra.swift in Sources */,
 				CD03116C2C135C620076443C /* ContentView.swift in Sources */,
-				CD3089252C16822B00FD5F84 /* pterm.swift in Sources */,
+				CD3089272C1A755700FD5F84 /* TextureRenderer.swift in Sources */,
 				CD03116E2C135C620076443C /* Item.swift in Sources */,
 				CD03116A2C135C620076443C /* CaliQuakeApp.swift in Sources */,
+				CD3089692C1A928C00FD5F84 /* starter.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

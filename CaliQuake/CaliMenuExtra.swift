@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Metal
 
 struct CaliMenuExtra: View {
     var body: some View {

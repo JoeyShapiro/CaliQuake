@@ -27,7 +27,9 @@ struct CaliQuakeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+//            ContentView()
+            MetalView()
+                .frame(width: 200, height: 200)
         }
         .modelContainer(sharedModelContainer)
         MenuBarExtra(
