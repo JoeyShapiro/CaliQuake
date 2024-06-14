@@ -5,7 +5,7 @@ func runBash() {
     let bashPath = "/bin/bash".withCString(strdup)
     
     var environment: [String: String] = ProcessInfo.processInfo.environment
-    environment["PATH"] = "/usr/bin:/bin:/usr/sbin:/sbin"
+    environment["PATH"] = getenv("PATH").flatMap { String(cString: $0) } ?? ""
     
     var fileActions: posix_spawn_file_actions_t? = nil
     posix_spawn_file_actions_init(&fileActions)
