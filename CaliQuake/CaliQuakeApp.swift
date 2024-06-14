@@ -23,13 +23,13 @@ struct CaliQuakeApp: App {
         }
     }()
     
-    @State var input = ""
+    @State public var input = ""
     @FocusState private var focused: Bool
 
     var body: some Scene {
         WindowGroup {
 //            ContentView()
-            MetalView()
+            MetalView(textBinding: $input)
                 .frame(width: 500, height: 500)
                 .focusable()
                 .focused($focused)
@@ -42,6 +42,7 @@ struct CaliQuakeApp: App {
                         Phase: \(keyPress.phase)
                         Debug description: \(keyPress.debugDescription)
                     """)
+                    input += keyPress.characters
                     return .handled
                 })
         }

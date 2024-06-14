@@ -12,7 +12,7 @@ class Renderer: NSObject {
     var pipelineState: MTLRenderPipelineState!
     var commandQueue: MTLCommandQueue!
     var vertexBuffer: MTLBuffer!
-    var texture: MTLTexture!
+    var text = "$ "
 
     init(device: MTLDevice) {
         self.device = device
@@ -30,8 +30,6 @@ class Renderer: NSObject {
         self.pipelineState = try! device.makeRenderPipelineState(descriptor: pipelineDescriptor)
 
         super.init()
-        
-        self.texture = createTextTexture(text: "Hello, Metal!", font: NSFont.systemFont(ofSize: 12), size: CGSize(width: 512, height: 512))
     }
 
     func drawableSizeWillChange(size: CGSize) {
@@ -40,7 +38,7 @@ class Renderer: NSObject {
 
     func draw(in view: MTKView) {
         // i changed the dimensions, removed verts, use tex coords, and changed the ordering
-        guard let imageData = convertCGImageToData(makeImage(text: "Hello, Metal!", font: NSFont.systemFont(ofSize: 12), size: CGSize(width: 512, height: 512))!) else {
+        guard let imageData = convertCGImageToData(makeImage(text: self.text, font: NSFont.monospacedSystemFont(ofSize: 12, weight: NSFont.Weight(rawValue: 0.1)), size: CGSize(width: 512, height: 512))!) else {
             fatalError("Could not load image file.")
         }
         
@@ -118,7 +116,7 @@ class Renderer: NSObject {
         
         // Draw the text
         let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .center
+        paragraphStyle.alignment = .left
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
             .paragraphStyle: paragraphStyle,

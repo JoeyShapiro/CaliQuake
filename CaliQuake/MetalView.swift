@@ -9,6 +9,9 @@ import SwiftUI
 import MetalKit
 
 struct MetalView: NSViewRepresentable {
+    @Binding public var text: String
+    private var coordinator: Coordinator
+    
     class Coordinator: NSObject, MTKViewDelegate {
         var renderer: Renderer
         
@@ -23,12 +26,20 @@ struct MetalView: NSViewRepresentable {
         func draw(in view: MTKView) {
             renderer.draw(in: view)
         }
+        
+        func update(text: String) {
+            renderer.text = text
+        }
     }
     
+    init(textBinding: Binding<String>) {
+        let device = MTLCreateSystemDefaultDevice()!
+        self.coordinator = Coordinator(device: device)
+        self._text = textBinding
+    }
 
     func makeCoordinator() -> Coordinator {
-        let device = MTLCreateSystemDefaultDevice()!
-        return Coordinator(device: device)
+        return self.coordinator
     }
     
     func makeNSView(context: Context) -> MTKView {
@@ -41,6 +52,7 @@ struct MetalView: NSViewRepresentable {
 
     func updateNSView(_ nsView: MTKView, context: Context) {
         // Handle updates if necessary
+        self.coordinator.update(text: self.text)
     }
 }
 
