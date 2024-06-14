@@ -19,43 +19,15 @@ class Renderer: NSObject {
         self.commandQueue = device.makeCommandQueue()
 
         let defaultLibrary = device.makeDefaultLibrary()
-        let vertexFunction = defaultLibrary?.makeFunction(name: "vertex_main")
-        let fragmentFunction = defaultLibrary?.makeFunction(name: "fragment_main")
-
+        
+        let fragmentProgram = defaultLibrary?.makeFunction(name: "fragmentShader")
+        
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
-        pipelineDescriptor.vertexFunction = vertexFunction
-        pipelineDescriptor.fragmentFunction = fragmentFunction
+        pipelineDescriptor.vertexFunction = defaultLibrary?.makeFunction(name: "vertexShader")
+        pipelineDescriptor.fragmentFunction = fragmentProgram
         pipelineDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
 
-        // Set up the vertex descriptor
-        let vertexDescriptor = MTLVertexDescriptor()
-        vertexDescriptor.attributes[0].format = .float4
-        vertexDescriptor.attributes[0].offset = 0
-        vertexDescriptor.attributes[0].bufferIndex = 0
-
-        vertexDescriptor.attributes[1].format = .float2
-        vertexDescriptor.attributes[1].offset = MemoryLayout<vector_float4>.size
-        vertexDescriptor.attributes[1].bufferIndex = 0
-
-        vertexDescriptor.layouts[0].stride = MemoryLayout<Vertex>.stride
-        vertexDescriptor.layouts[0].stepRate = 1
-        vertexDescriptor.layouts[0].stepFunction = .perVertex
-
-        pipelineDescriptor.vertexDescriptor = vertexDescriptor
-
         self.pipelineState = try! device.makeRenderPipelineState(descriptor: pipelineDescriptor)
-
-        // Quad vertices with positions and texture coordinates
-        let vertices = [
-            Vertex(position: [-1.0,  1.0, 0.0, 1.0], texCoord: [0.0, 1.0]),
-            Vertex(position: [-1.0, -1.0, 0.0, 1.0], texCoord: [0.0, 0.0]),
-            Vertex(position: [ 1.0, -1.0, 0.0, 1.0], texCoord: [1.0, 0.0]),
-            Vertex(position: [-1.0,  1.0, 0.0, 1.0], texCoord: [0.0, 1.0]),
-            Vertex(position: [ 1.0, -1.0, 0.0, 1.0], texCoord: [1.0, 0.0]),
-            Vertex(position: [ 1.0,  1.0, 0.0, 1.0], texCoord: [1.0, 1.0])
-        ]
-
-        self.vertexBuffer = device.makeBuffer(bytes: vertices, length: vertices.count * MemoryLayout<Vertex>.size, options: [])
 
         super.init()
         
@@ -67,22 +39,99 @@ class Renderer: NSObject {
     }
 
     func draw(in view: MTKView) {
-        guard let drawable = view.currentDrawable,
-              let renderPassDescriptor = view.currentRenderPassDescriptor else { return }
-
-        let commandBuffer = commandQueue.makeCommandBuffer()!
-        let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
-        
-        renderEncoder.setRenderPipelineState(pipelineState)
-        renderEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
-        if let textTexture = createTextTexture(text: "Hello, Metal!", font: NSFont.systemFont(ofSize: 12), size: CGSize(width: 128, height: 128)) {
-            renderEncoder.setFragmentTexture(textTexture, index: 0)
+        guard let imageData = convertCGImageToData(makeImage(text: "Hello, Metal!", font: NSFont.systemFont(ofSize: 12), size: CGSize(width: 512, height: 512))!) else {
+            fatalError("Could not load image file.")
         }
-        renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         
-        renderEncoder.endEncoding()
+        let textureLoader = MTKTextureLoader(device: view.device!)
+        
+        let texture = try? textureLoader.newTexture(data: imageData, options: nil)
+        
+        guard let commandBuffer = view.device?.makeCommandQueue()?.makeCommandBuffer(),
+              let descriptor = view.currentRenderPassDescriptor,
+              let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor) else {
+            return
+        }
+        
+        encoder.setRenderPipelineState(pipelineState!)
+        encoder.setFragmentTexture(texture, index: 0)
+        
+        let vertices: [Float] = [
+            -1.0, -1.0,
+             1.0, -1.0,
+             -1.0,  1.0,
+             1.0,  1.0
+        ]
+        let vertexBuffer = view.device?.makeBuffer(bytes: vertices, length: vertices.count * MemoryLayout<Float>.size, options: [])
+        encoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
+        
+        let texCoords: [Float] = [
+            0.0, 1.0,
+            1.0, 1.0,
+            0.0, 0.0,
+            1.0, 0.0
+        ]
+        let texCoordBuffer = view.device?.makeBuffer(bytes: texCoords, length: texCoords.count * MemoryLayout<Float>.size, options: [])
+        encoder.setVertexBuffer(texCoordBuffer, offset: 0, index: 1)
+        
+        encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
+        encoder.endEncoding()
+        
+        guard let drawable = view.currentDrawable else {
+            return
+        }
         commandBuffer.present(drawable)
         commandBuffer.commit()
+    }
+    
+    func convertCGImageToData(_ cgImage: CGImage, format: CFString = kUTTypePNG, quality: CGFloat = 1.0) -> Data? {
+        let data = NSMutableData()
+        
+        guard let destination = CGImageDestinationCreateWithData(data, format, 1, nil) else {
+            return nil
+        }
+        
+        CGImageDestinationAddImage(destination, cgImage, [
+            kCGImageDestinationLossyCompressionQuality: quality
+        ] as CFDictionary)
+        
+        guard CGImageDestinationFinalize(destination) else {
+            return nil
+        }
+        
+        return data as Data
+    }
+    
+    private func makeImage(text: String, font: NSFont, size: CGSize) -> CGImage? {
+        // Create a bitmap context
+        let scale = NSScreen.main?.backingScaleFactor ?? 1.0
+        let width = Int(size.width * scale)
+        let height = Int(size.height * scale)
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue
+        guard let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 4 * width, space: colorSpace, bitmapInfo: bitmapInfo) else { return nil }
+        
+        context.scaleBy(x: scale, y: scale)
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
+        
+        // Draw the text
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .paragraphStyle: paragraphStyle,
+            .foregroundColor: NSColor.white
+        ]
+        let rect = CGRect(origin: .zero, size: size)
+        text.draw(in: rect, withAttributes: attributes)
+        
+        NSGraphicsContext.restoreGraphicsState()
+        
+        // Create a texture from the bitmap context
+        guard let image = context.makeImage() else { return nil }
+        
+        return image
     }
 
     private func createTextTexture(text: String, font: NSFont, size: CGSize) -> MTLTexture? {
@@ -113,14 +162,11 @@ class Renderer: NSObject {
         
         // Create a texture from the bitmap context
         guard let image = context.makeImage() else { return nil }
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: width, height: height, mipmapped: false)
-        textureDescriptor.usage = [.shaderRead, .shaderWrite]
-        guard let texture = device.makeTexture(descriptor: textureDescriptor) else { return nil }
 
-        let region = MTLRegionMake2D(0, 0, width, height)
-        let bytesPerRow = 4 * width
-        let data = context.data!
-        texture.replace(region: region, mipmapLevel: 0, withBytes: data, bytesPerRow: bytesPerRow)
+//        let region = MTLRegionMake2D(0, 0, width, height)
+//        let bytesPerRow = 4 * width
+//        let data = context.data!
+//        texture.replace(region: region, mipmapLevel: 0, withBytes: data, bytesPerRow: bytesPerRow)
         
         return createTexture(from: image)
     }
