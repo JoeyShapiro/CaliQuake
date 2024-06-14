@@ -5,6 +5,12 @@ import CoreImage.CIFilterBuiltins
 import SwiftUI
 import MetalKit
 import AppKit
+import Metal
+
+struct Vertex {
+    var position: vector_float4
+    var texCoord: vector_float2
+}
 
 struct MetalView: NSViewRepresentable {
 
@@ -18,6 +24,9 @@ struct MetalView: NSViewRepresentable {
         private var commandQueue: MTLCommandQueue
         private var pipelineState: MTLRenderPipelineState
         private var vertexBuffer: MTLBuffer
+        var texture: MTLTexture!
+        var ciContext: CIContext!
+
 
         override init() {
 
@@ -25,19 +34,45 @@ struct MetalView: NSViewRepresentable {
 
             let library = device.makeDefaultLibrary()!
             let descriptor = MTLRenderPipelineDescriptor()
-            let vertices: [simd_float2] = [[-1, +1],  [+1, +1],  [-1, -1],  [+1, -1]]
-            let verticesLength = 4 * MemoryLayout<simd_float2>.stride
+            let vertices = [
+                Vertex(position: [-1.0,  1.0, 0.0, 1.0], texCoord: [0.0, 1.0]),
+                Vertex(position: [-1.0, -1.0, 0.0, 1.0], texCoord: [0.0, 0.0]),
+                Vertex(position: [ 1.0, -1.0, 0.0, 1.0], texCoord: [1.0, 0.0]),
+                Vertex(position: [-1.0,  1.0, 0.0, 1.0], texCoord: [0.0, 1.0]),
+                Vertex(position: [ 1.0, -1.0, 0.0, 1.0], texCoord: [1.0, 0.0]),
+                Vertex(position: [ 1.0,  1.0, 0.0, 1.0], texCoord: [1.0, 1.0])
+            ]
+            vertexBuffer = device.makeBuffer(bytes: vertices, length: vertices.count * MemoryLayout<Vertex>.size, options: [])!
+
 
             descriptor.label = "Pixel Shader"
-            descriptor.vertexFunction = library.makeFunction(name: "init")
-            descriptor.fragmentFunction = library.makeFunction(name: "draw")
+            descriptor.vertexFunction = library.makeFunction(name: "vertex_main")
+            descriptor.fragmentFunction = library.makeFunction(name: "fragment_main")
             descriptor.colorAttachments[0].pixelFormat = MetalView.pixelFormat
+
+            // Set up the vertex descriptor
+            let vertexDescriptor = MTLVertexDescriptor()
+            vertexDescriptor.attributes[0].format = .float4
+            vertexDescriptor.attributes[0].offset = 0
+            vertexDescriptor.attributes[0].bufferIndex = 0
+
+            vertexDescriptor.attributes[1].format = .float2
+            vertexDescriptor.attributes[1].offset = MemoryLayout<vector_float4>.size
+            vertexDescriptor.attributes[1].bufferIndex = 0
+
+            vertexDescriptor.layouts[0].stride = MemoryLayout<Vertex>.stride
+            vertexDescriptor.layouts[0].stepRate = 1
+            vertexDescriptor.layouts[0].stepFunction = .perVertex
+
+            descriptor.vertexDescriptor = vertexDescriptor
 
             commandQueue = device.makeCommandQueue()!
             pipelineState = try! device.makeRenderPipelineState(descriptor: descriptor)
-            vertexBuffer = device.makeBuffer(bytes: vertices, length: verticesLength, options: [])!
 
             super.init()
+            
+            ciContext = CIContext(mtlDevice: device)
+            texture = createTexture(from: createFilteredImage())
         }
 
         func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) { }
@@ -47,14 +82,35 @@ struct MetalView: NSViewRepresentable {
             let buffer = commandQueue.makeCommandBuffer()!
             let descriptor = view.currentRenderPassDescriptor!
             let encoder = buffer.makeRenderCommandEncoder(descriptor: descriptor)!
+            
 
             encoder.setRenderPipelineState(pipelineState)
             encoder.setVertexBuffer(self.vertexBuffer, offset: 0, index: 0)
+            encoder.setFragmentTexture(texture, index: 0)
             encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
             encoder.endEncoding()
 
             buffer.present(view.currentDrawable!)
             buffer.commit()
+        }
+        
+        private func createFilteredImage() -> CIImage {
+            // Create a simple CIFilter (e.g., a sepia tone filter)
+            let textImageGenerator = CIFilter.textImageGenerator()
+            textImageGenerator.text = "Hello World!"
+            // ...
+            return textImageGenerator.outputImage!
+        }
+
+        private func createTexture(from image: CIImage) -> MTLTexture? {
+            let width = Int(image.extent.width)
+            let height = Int(image.extent.height)
+            let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: width, height: height, mipmapped: false)
+            textureDescriptor.usage = [.shaderRead, .shaderWrite]
+            guard let texture = device.makeTexture(descriptor: textureDescriptor) else { return nil }
+
+            ciContext.render(image, to: texture, commandBuffer: nil, bounds: image.extent, colorSpace: CGColorSpaceCreateDeviceRGB())
+            return texture
         }
     }
 
