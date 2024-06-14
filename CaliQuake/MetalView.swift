@@ -28,7 +28,7 @@ struct MetalView: NSViewRepresentable {
         }
         
         func update(text: String) {
-            renderer.text = text
+            renderer.update(text: text)
         }
     }
     

@@ -23,7 +23,7 @@ struct CaliQuakeApp: App {
         }
     }()
     
-    @State public var input = ""
+    @State public var input = "$ "
     @FocusState private var focused: Bool
 
     var body: some Scene {

@@ -12,7 +12,9 @@ class Renderer: NSObject {
     var pipelineState: MTLRenderPipelineState!
     var commandQueue: MTLCommandQueue!
     var vertexBuffer: MTLBuffer!
-    var text = "$ "
+    private var text = "$ "
+    private var texture: MTLTexture?
+    private var isDirty = true
 
     init(device: MTLDevice) {
         self.device = device
@@ -28,6 +30,8 @@ class Renderer: NSObject {
         pipelineDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
 
         self.pipelineState = try! device.makeRenderPipelineState(descriptor: pipelineDescriptor)
+    
+        self.texture = nil
 
         super.init()
     }
@@ -35,16 +39,27 @@ class Renderer: NSObject {
     func drawableSizeWillChange(size: CGSize) {
         // Handle size change if necessary
     }
+    
+    func update(text: String) {
+        self.text = text
+        self.isDirty = true
+    }
 
     func draw(in view: MTKView) {
         // i changed the dimensions, removed verts, use tex coords, and changed the ordering
-        guard let imageData = convertCGImageToData(makeImage(text: self.text, font: NSFont.monospacedSystemFont(ofSize: 12, weight: NSFont.Weight(rawValue: 0.1)), size: CGSize(width: 512, height: 512))!) else {
-            fatalError("Could not load image file.")
+        if isDirty {
+            let imageData = convertCGImageToData(makeImage(text: self.text, font: NSFont.monospacedSystemFont(ofSize: 12, weight: NSFont.Weight(rawValue: 0.1)), size: CGSize(width: 512, height: 512))!)!
+            
+            let textureLoader = MTKTextureLoader(device: view.device!)
+            
+            self.texture = try? textureLoader.newTexture(data: imageData, options: nil)
+            
+            isDirty = false
         }
         
-        let textureLoader = MTKTextureLoader(device: view.device!)
-        
-        let texture = try? textureLoader.newTexture(data: imageData, options: nil)
+        guard let texture = self.texture else {
+            return
+        }
         
         guard let commandBuffer = view.device?.makeCommandQueue()?.makeCommandBuffer(),
               let descriptor = view.currentRenderPassDescriptor,
