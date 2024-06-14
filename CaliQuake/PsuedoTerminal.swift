@@ -13,6 +13,7 @@ struct PsuedoTerminal {
     private var pipe_stdin: Pipe
     private var pipe_stdout: Pipe
     private var pipe_stderr: Pipe
+    private var pid: pid_t
     
     init() {
         var environment: [String: String] = ProcessInfo.processInfo.environment
@@ -29,16 +30,12 @@ struct PsuedoTerminal {
         self.pipe_stderr = Pipe()
         posix_spawn_file_actions_adddup2(&self.fileActions, pipe_stderr.w, STDERR_FILENO)
         
-        var pid: pid_t = 0
-        let result = posix_spawn(&pid, shell, &fileActions, nil, [shell], environment.keys.map { $0.withCString(strdup) })
+        self.pid = 0
+        let result = posix_spawn(&self.pid, shell, &fileActions, nil, [shell], environment.keys.map { $0.withCString(strdup) })
         
         if result != 0 {
             fatalError("Error launching Bash: \(result)")
         }
-        
-        // TODO not sure where this goes
-        var status: Int32 = 0
-        waitpid(pid, &status, 0)
     }
     
     func write(command: String) -> Int {
@@ -56,19 +53,20 @@ struct PsuedoTerminal {
         return n
     }
     
-    func read() -> Data {
+    func read() -> (Data, Int) {
         var data = Data()
         let bufferSize = 1024
         var buffer = [UInt8](repeating: 0, count: bufferSize)
         
         var bytesRead = Darwin.read(self.pipe_stdout.r, &buffer, bufferSize) // Use outPipeFDs[0] for reading
         print("bytesRead: \(bytesRead)")
-        while bytesRead > 0 {
-            data.append(buffer, count: bytesRead)
-            bytesRead = Darwin.read(self.pipe_stdout.r, &buffer, bufferSize) // Use outPipeFDs[0] for reading
-            print("bytesRead: \(bytesRead)")
-            
-        }
+        data.append(buffer, count: bytesRead)
+//        while bytesRead > 0 {
+//            data.append(buffer, count: bytesRead)
+//            bytesRead = Darwin.read(self.pipe_stdout.r, &buffer, bufferSize) // Use outPipeFDs[0] for reading
+//            print("bytesRead: \(bytesRead)")
+//            
+//        }
         
         if let output = String(data: data, encoding: .utf8) {
             print("Output from Bash:\n\(output)")
@@ -76,7 +74,7 @@ struct PsuedoTerminal {
             print("Error decoding output data")
         }
         
-        return data
+        return (data, bytesRead)
     }
     
     // medium pizza with crumble sausage, pepperoni, bananna peppers, olives, and pineapple
@@ -91,6 +89,10 @@ struct PsuedoTerminal {
         self.pipe_stdin.close()
         self.pipe_stdout.close()
         self.pipe_stderr.close()
+        
+        // TODO not sure where this goes
+        var status: Int32 = 0
+        waitpid(pid, &status, 0)
     }
 }
 

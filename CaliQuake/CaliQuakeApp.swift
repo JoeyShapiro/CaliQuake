@@ -25,7 +25,7 @@ struct CaliQuakeApp: App {
     
     @State public var input = "$ "
     @FocusState private var focused: Bool
-    @State var pty: PsuedoTerminal
+    @State private var pty: PsuedoTerminal? = nil
 
     var body: some Scene {
         WindowGroup {
@@ -61,35 +61,36 @@ struct CaliQuakeApp: App {
     func startThreads() {
         pty = PsuedoTerminal()
         Task {
-            await MainActor.run {
-                pty.write(command: "echo hello")
-            }
+            await runThread1()
         }
         
         Task {
-            await MainActor.run {
-                pty.read()
-            }
+            await runThread2()
         }
         
 //        pty.close()
     }
     
     func runThread1() async {
-        for i in 1...5 {
-            await MainActor.run {
-                input += "Thread 1: \(i)\n"
-            }
-            try? await Task.sleep(nanoseconds: 1_000_000_000)
+        await MainActor.run {
+            input += "echo hello\n"
+            let n = pty!.write(command: "echo hello\n")
+            print("wrote \(n)")
+            
         }
     }
     
     func runThread2() async {
-        for i in 1...5 {
-            await MainActor.run {
-                input += "Thread 2: \(i)\n"
+        await MainActor.run {
+            input += "Thread 2: \n"
+            var (data, n) = pty!.read()
+            print("read \(n)")
+            if let output = String(data: data, encoding: .utf8) {
+                input += output
             }
-            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            while n > 0 {
+                (data, n) = pty!.read()
+            }
         }
     }
 }
