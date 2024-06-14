@@ -57,7 +57,7 @@ func runBash() {
         let n = write(pipeFDs[1], ptr.baseAddress!, ptr.count)
         print("wrote \(n) bytes")
     }
-    
+
     commandData2.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
         let n = write(pipeFDs[1], ptr.baseAddress!, ptr.count)
         print("wrote \(n) bytes")
@@ -68,19 +68,23 @@ func runBash() {
         print("wrote \(n) bytes")
     }
 
-    close(outPipeFDs[1])
-    
     // Read output from the spawned process
     var outputData = Data()
     let bufferSize = 1024
     var buffer = [UInt8](repeating: 0, count: bufferSize)
     
     var bytesRead = read(outPipeFDs[0], &buffer, bufferSize) // Use outPipeFDs[0] for reading
-    print("bytesRead: \(bytesRead)")
+    print("--------- bytesRead: \(bytesRead)")
+    if let output = String(data: outputData, encoding: .utf8) {
+        print("Output from Bash:\n\(output)")
+    } else {
+        print("Error decoding output data")
+    }
     while bytesRead > 0 {
-        outputData.append(buffer, count: bytesRead)
+        outputData.removeAll()
         bytesRead = read(outPipeFDs[0], &buffer, bufferSize) // Use outPipeFDs[0] for reading
-        print("bytesRead: \(bytesRead)")
+        outputData.append(buffer, count: bytesRead)
+        print("-------- bytesRead: \(bytesRead)")
 
         if let output = String(data: outputData, encoding: .utf8) {
             print("Output from Bash:\n\(output)")
@@ -88,6 +92,12 @@ func runBash() {
             print("Error decoding output data")
         }
     }
+    // actually this is fine i think.
+    // i shold have a thread for reading and writing.
+    // maybe i will need to read while writign
+    // ... maybe
+
+    close(outPipeFDs[1])
     
     var status: Int32 = 0
     waitpid(pid, &status, 0)
