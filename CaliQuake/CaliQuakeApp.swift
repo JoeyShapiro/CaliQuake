@@ -24,12 +24,26 @@ struct CaliQuakeApp: App {
     }()
     
     @State var input = ""
+    @FocusState private var focused: Bool
 
     var body: some Scene {
         WindowGroup {
 //            ContentView()
             MetalView()
                 .frame(width: 500, height: 500)
+                .focusable()
+                .focused($focused)
+                .focusEffectDisabled()
+                .onKeyPress(action: { keyPress in
+                    print("""
+                        New key event:
+                        Key: \(keyPress.characters)
+                        Modifiers: \(keyPress.modifiers)
+                        Phase: \(keyPress.phase)
+                        Debug description: \(keyPress.debugDescription)
+                    """)
+                    return .handled
+                })
         }
         .modelContainer(sharedModelContainer)
         MenuBarExtra(

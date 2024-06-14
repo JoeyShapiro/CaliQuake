@@ -24,6 +24,7 @@ struct MetalView: NSViewRepresentable {
             renderer.draw(in: view)
         }
     }
+    
 
     func makeCoordinator() -> Coordinator {
         let device = MTLCreateSystemDefaultDevice()!

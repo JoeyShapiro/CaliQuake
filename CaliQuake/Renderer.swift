@@ -39,6 +39,7 @@ class Renderer: NSObject {
     }
 
     func draw(in view: MTKView) {
+        // i changed the dimensions, removed verts, use tex coords, and changed the ordering
         guard let imageData = convertCGImageToData(makeImage(text: "Hello, Metal!", font: NSFont.systemFont(ofSize: 12), size: CGSize(width: 512, height: 512))!) else {
             fatalError("Could not load image file.")
         }
