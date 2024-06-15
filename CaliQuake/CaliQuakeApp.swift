@@ -23,13 +23,14 @@ struct CaliQuakeApp: App {
         }
     }()
     
-    @State public var input = "$ "
+    @State public var text = ""
+    @State public var command = ""
     @FocusState private var focused: Bool
     @State private var pty: PseudoTerminal? = nil
 
     var body: some Scene {
         WindowGroup {
-            MetalView(textBinding: $input)
+            MetalView(textBinding: $text)
                 .frame(width: 500, height: 500)
                 .focusable()
                 .focused($focused)
@@ -42,7 +43,13 @@ struct CaliQuakeApp: App {
                         Phase: \(keyPress.phase)
                         Debug description: \(keyPress.debugDescription)
                     """)
-                    input += keyPress.characters
+                    if keyPress.characters == "\r" || keyPress.characters == "\n" {
+                        command += "\n"
+                    } else {
+                        command += keyPress.characters
+                    }
+
+                    text += keyPress.characters
                     return .handled
                 })
                 Button("Start Threads") {
@@ -73,29 +80,42 @@ struct CaliQuakeApp: App {
     
     func runThread1() async {
         await MainActor.run {
-            input += "echo hello\n"
-            let n = pty!.write(command: "python3 -c 'import sys; print(sys.stdout.isatty())'\n")
-            print("wrote \(n)")
-            
-            input += "Thread 2: \n"
-            var (data, n2) = pty!.read()
-            while n2 > 0 {
-                if let output = String(data: data, encoding: .utf8) {
-                    input += output
+            command = "python3 -c 'import sys; print(sys.stdout.isatty())'\n"
+            loop: while true {
+                if !command.hasSuffix("\n") {
+                    continue
                 }
-                (data, n2) = pty!.read()
-                print("read \(n2)")
+                //            text += command
+                let n = pty!.write(command: command)
+                command = ""
+                print("wrote \(n)")
+                
+                text += "Thread 2: \n"
+                var (data, n2) = pty!.read()
+                while n2 > 0 {
+                    if let output = String(data: data, encoding: .utf8) {
+                        text += output
+                        if output.contains("$") {
+                            break
+                        }
+                        if output == "exit" {
+                            break loop
+                        }
+                    }
+                    (data, n2) = pty!.read()
+                    print("read \(n2)")
+                }
             }
         }
     }
     
     func runThread2() async {
         await MainActor.run {
-            input += "Thread 2: \n"
+            text += "Thread 2: \n"
             var (data, n) = pty!.read()
             print("read \(n)")
             if let output = String(data: data, encoding: .utf8) {
-                input += output
+                text += output
             }
             while n > 0 {
                 (data, n) = pty!.read()
