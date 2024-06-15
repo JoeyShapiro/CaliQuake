@@ -64,9 +64,9 @@ struct CaliQuakeApp: App {
             await runThread1()
         }
         
-        Task {
-            await runThread2()
-        }
+//        Task {
+//            await runThread2()
+//        }
         
 //        pty.close()
     }
@@ -74,9 +74,18 @@ struct CaliQuakeApp: App {
     func runThread1() async {
         await MainActor.run {
             input += "echo hello\n"
-            let n = pty!.write(command: "echo hello\n")
+            let n = pty!.write(command: "python3 -c 'import sys; print(sys.stdout.isatty())'\n")
             print("wrote \(n)")
             
+            input += "Thread 2: \n"
+            var (data, n2) = pty!.read()
+            while n2 > 0 {
+                if let output = String(data: data, encoding: .utf8) {
+                    input += output
+                }
+                (data, n2) = pty!.read()
+                print("read \(n2)")
+            }
         }
     }
     
