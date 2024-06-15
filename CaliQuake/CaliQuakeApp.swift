@@ -79,32 +79,30 @@ struct CaliQuakeApp: App {
     }
     
     func runThread1() async {
-        await MainActor.run {
-            command = "python3 -c 'import sys; print(sys.stdout.isatty())'\n"
-            loop: while true {
-                if !command.hasSuffix("\n") {
-                    continue
-                }
-                //            text += command
-                let n = pty!.write(command: command)
-                command = ""
-                print("wrote \(n)")
-                
-                text += "Thread 2: \n"
-                var (data, n2) = pty!.read()
-                while n2 > 0 {
-                    if let output = String(data: data, encoding: .utf8) {
-                        text += output
-                        if output.contains("$") {
-                            break
-                        }
-                        if output == "exit" {
-                            break loop
-                        }
+        command = "python3 -c 'import sys; print(sys.stdout.isatty())'\n"
+        loop: while true {
+            if !command.hasSuffix("\n") {
+                continue
+            }
+            //            text += command
+            let n = pty!.write(command: command)
+            command = ""
+            print("wrote \(n)")
+            
+            text += "Thread 2: \n"
+            var (data, n2) = pty!.read()
+            while n2 > 0 {
+                if let output = String(data: data, encoding: .utf8) {
+                    text += output
+                    if output.contains("$") {
+                        break
                     }
-                    (data, n2) = pty!.read()
-                    print("read \(n2)")
+                    if output == "exit" {
+                        break loop
+                    }
                 }
+                (data, n2) = pty!.read()
+                print("read \(n2)")
             }
         }
     }
