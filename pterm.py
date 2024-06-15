@@ -33,6 +33,7 @@ def main():
     if pid == 0:
         # Child process
         # Replace the child process with the bash shell
+        print("Child PID is", os.getpid())
         os.execlp(SHELL, SHELL)
     else:
         # Parent process
@@ -45,7 +46,8 @@ def main():
                 "echo Hello from PTY\n",
                 "ls\n",
                 "pwd\n",
-                "exit\n"
+                "python -c 'import sys; print(sys.stdout.isatty())'\n"
+                "exit\n",
             ]
 
             for command in commands:

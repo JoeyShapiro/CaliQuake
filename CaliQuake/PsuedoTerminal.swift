@@ -7,12 +7,11 @@
 
 import Foundation
 
-struct PsuedoTerminal {
+struct PseudoTerminal {
     private var shell = "/bin/sh".withCString(strdup)
     private var fileActions: posix_spawn_file_actions_t? = nil
-    private var pipe_stdin: Pipe
-    private var pipe_stdout: Pipe
-    private var pipe_stderr: Pipe
+    private var master: Int32 = 0
+    private var slave: Int32 = 0
     private var pid: pid_t
     
     init() {
@@ -21,33 +20,35 @@ struct PsuedoTerminal {
         
         posix_spawn_file_actions_init(&self.fileActions)
         
-        self.pipe_stdin = Pipe()
-        // the program READS from strdin
-        posix_spawn_file_actions_adddup2(&self.fileActions, pipe_stdin.r, STDIN_FILENO)
-        self.pipe_stdout = Pipe()
-        // the program WRITES to stdout
-        posix_spawn_file_actions_adddup2(&self.fileActions, pipe_stdout.w, STDOUT_FILENO)
-        self.pipe_stderr = Pipe()
-        posix_spawn_file_actions_adddup2(&self.fileActions, pipe_stderr.w, STDERR_FILENO)
+        var amaster: Int32 = 0
+        var aslave: Int32 = 0
+        let result = openpty(&amaster, &aslave, nil, nil, nil)
+        if result != 0 {
+            fatalError("Error creating pseudo-terminal: \(result)")
+        }
+        self.master = amaster
+        self.slave = aslave
+        
+        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDIN_FILENO)
+        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDOUT_FILENO)
+        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDERR_FILENO)
+        posix_spawn_file_actions_addclose(&self.fileActions, self.master)
         
         self.pid = 0
-        let result = posix_spawn(&self.pid, shell, &fileActions, nil, [shell], environment.keys.map { $0.withCString(strdup) })
+        let spawnResult = posix_spawn(&self.pid, shell, &fileActions, nil, [shell], environment.keys.map { $0.withCString(strdup) })
         
-        if result != 0 {
-            fatalError("Error launching Bash: \(result)")
+        if spawnResult != 0 {
+            fatalError("Error launching shell: \(spawnResult)")
         }
+        
+        Darwin.close(self.slave)
     }
     
     func write(command: String) -> Int {
         let buf = command.data(using: .utf8)!
         
-        // write the command buffer to stdin
         let n = buf.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
-            let n = Darwin.write(self.pipe_stdin.w, ptr.baseAddress!, ptr.count)
-            // TODO remove all this, and just return output of darwin.write
-            print("wrote \(n) bytes")
-            
-            return n
+            Darwin.write(self.master, ptr.baseAddress!, ptr.count)
         }
         
         return n
@@ -58,18 +59,11 @@ struct PsuedoTerminal {
         let bufferSize = 1024
         var buffer = [UInt8](repeating: 0, count: bufferSize)
         
-        var bytesRead = Darwin.read(self.pipe_stdout.r, &buffer, bufferSize) // Use outPipeFDs[0] for reading
-        print("bytesRead: \(bytesRead)")
+        let bytesRead = Darwin.read(self.master, &buffer, bufferSize)
         data.append(buffer, count: bytesRead)
-//        while bytesRead > 0 {
-//            data.append(buffer, count: bytesRead)
-//            bytesRead = Darwin.read(self.pipe_stdout.r, &buffer, bufferSize) // Use outPipeFDs[0] for reading
-//            print("bytesRead: \(bytesRead)")
-//            
-//        }
         
         if let output = String(data: data, encoding: .utf8) {
-            print("Output from Bash:\n\(output)")
+            print("Output from shell:\n\(output)")
         } else {
             print("Error decoding output data")
         }
@@ -77,20 +71,12 @@ struct PsuedoTerminal {
         return (data, bytesRead)
     }
     
-    // medium pizza with crumble sausage, pepperoni, bananna peppers, olives, and pineapple
-    // 25.86$
-    
-    // TODO i could get fancy, like stdout.w should close when it is done
     mutating func close() {
         posix_spawn_file_actions_destroy(&self.fileActions)
         self.fileActions?.deallocate()
         
-        // close the pipes
-        self.pipe_stdin.close()
-        self.pipe_stdout.close()
-        self.pipe_stderr.close()
+        Darwin.close(self.master)
         
-        // TODO not sure where this goes
         var status: Int32 = 0
         waitpid(pid, &status, 0)
     }
@@ -206,4 +192,3 @@ func runBash() {
     var status: Int32 = 0
     waitpid(pid, &status, 0)
 }
-

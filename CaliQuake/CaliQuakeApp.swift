@@ -25,7 +25,7 @@ struct CaliQuakeApp: App {
     
     @State public var input = "$ "
     @FocusState private var focused: Bool
-    @State private var pty: PsuedoTerminal? = nil
+    @State private var pty: PseudoTerminal? = nil
 
     var body: some Scene {
         WindowGroup {
@@ -59,7 +59,7 @@ struct CaliQuakeApp: App {
     }
     
     func startThreads() {
-        pty = PsuedoTerminal()
+        pty = PseudoTerminal()
         Task {
             await runThread1()
         }
