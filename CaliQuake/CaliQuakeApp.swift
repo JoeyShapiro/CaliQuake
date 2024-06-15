@@ -45,11 +45,25 @@ struct CaliQuakeApp: App {
                     """)
                     if keyPress.characters == "\r" || keyPress.characters == "\n" {
                         command += "\n"
+                        text += keyPress.characters
+                    } else if keyPress.characters == "\u{7f}" { // backspace
+                        command.removeLast()
+                        text.removeLast()
                     } else {
                         command += keyPress.characters
+                        text += keyPress.characters
                     }
+                    
+                    // escape codes
+                    // my escapes
+                    // ls colors
+                    // 
+                    // read / write threads
+                    // window size
+                    // name
+                    // write is one char at a time
+                    // look at echo on
 
-                    text += keyPress.characters
                     return .handled
                 })
                 Button("Start Threads") {

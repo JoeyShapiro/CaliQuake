@@ -8,7 +8,7 @@
 import Foundation
 
 struct PseudoTerminal {
-    private var shell = "/bin/bash".withCString(strdup)
+    private var shell = "/bin/zsh".withCString(strdup)
     private var fileActions: posix_spawn_file_actions_t? = nil
     private var master: Int32 = 0
     private var slave: Int32 = 0
@@ -21,6 +21,8 @@ struct PseudoTerminal {
         posix_spawn_file_actions_init(&self.fileActions)
         
         var winp: winsize = winsize()
+        winp.ws_row = 24
+        winp.ws_col = 80
         let result = openpty(&master, &slave, nil, nil, &winp)
         if result != 0 {
             fatalError("Error creating pseudo-terminal: \(result)")
