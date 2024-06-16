@@ -45,22 +45,20 @@ struct CaliQuakeApp: App {
                     """)
                     if keyPress.characters == "\r" || keyPress.characters == "\n" {
                         command += "\n"
-                        text += keyPress.characters
+//                        text += keyPress.characters
                     } else if keyPress.characters == "\u{7f}" { // backspace
 //                        command.removeLast()
                         command += keyPress.characters
-                        text.removeLast()
+//                        text.removeLast()
                     } else {
                         command += keyPress.characters
-                        text += keyPress.characters
+//                        text += keyPress.characters // the keys are duping or somthing
                     }
                     
                     // escape codes
                     // ls colors
-                    // 
-                    // read / write threads
+                    //
                     // name
-                    // write is one char at a time
 
                     return .handled
                 })
@@ -135,8 +133,10 @@ struct CaliQuakeApp: App {
                 parsed.append(c)
             }
             
+            // its doing the auto complete, so i have to handle escapes now
+            
             // shrug
-            if isEscaped && c == bel {
+            if isEscaped && (c == bel || c == "m") {
                 isEscaped = false
             }
         }
