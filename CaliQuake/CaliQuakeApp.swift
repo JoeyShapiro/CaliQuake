@@ -119,26 +119,44 @@ struct CaliQuakeApp: App {
     }
     
     func parse(_ stdout: String) -> String {
-        var isEscaped = false
+        var isEsc = false
+        var isMeta = false
         var parsed = ""
         let esc = Character(Unicode.Scalar(0o33))
         let bel = Character(Unicode.Scalar(0o7))
         
-        for c in stdout {
-            if c == esc {
-                isEscaped = true
+        for idx in (0...stdout.count-1) {
+            let i = stdout.index(stdout.startIndex, offsetBy: idx)
+            if stdout[i] == esc {
+                isEsc = true
+                // good enough, until i do real parsing on whole thing
+                // esc [ 6 9 7 ;
+                //   0 1 2 3 4 5
+                // ??
+                let i2 = stdout.index(i, offsetBy: 2)
+                let i3 = stdout.index(i, offsetBy: 3)
+                let i4 = stdout.index(i, offsetBy: 4)
+                isMeta = stdout[i2] == "6" && stdout[i3] == "9" && stdout[i4] == "7"
             }
             
-            if !isEscaped {
-                parsed.append(c)
+            if !isEsc {
+                parsed.append(stdout[i])
             }
             
             // its doing the auto complete, so i have to handle escapes now
             
             // shrug
-            if isEscaped && (c == bel || c == "m") {
-                isEscaped = false
+            if isMeta && stdout[i] == bel {
+                isEsc = false
+                isMeta = false
             }
+            if isEsc && !isMeta && (stdout[i] == "m" || stdout[i] == "h") {
+                isEsc = false
+            }
+        }
+        
+        for c in stdout {
+            
         }
         
         return parsed
