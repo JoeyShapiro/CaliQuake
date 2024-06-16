@@ -1,0 +1,21 @@
+echo Hello from PTY
+Child PID is 19706
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+]697;OSCUnlock=e90b361711284ea9af1ab8c876262f97]697;Dir=/Users/oniichan/Documents/Code/CaliQuake]697;Shell=bash]697;ShellPath=/bin/bash]697;PID=19706]697;ExitCode=0]697;TTY=/dev/ttys013]697;Log=]697;User=oniichan]697;OSCLock=e90b361711284ea9af1ab8c876262f97]697;PreExec]697;OSCLock=e90b361711284ea9af1ab8c876262f97]697;PreExec[?1034h]697;StartPromptbash-3.2$ ]697;EndPrompt]697;NewCmd=e90b361711284ea9af1ab8c876262f97echo Hello from PTY
+Hello from PTY
+]697;OSCUnlock=e90b361711284ea9af1ab8c876262f97]697;Dir=/Users/oniichan/Documents/Code/CaliQuake]697;Shell=bash]697;ShellPath=/bin/bash]697;PID=19706]697;ExitCode=0]697;TTY=/dev/ttys013]697;Log=]697;User=oniichan]697;StartPromptbash-3.2$ ]697;EndPrompt]697;NewCmd=e90b361711284ea9af1ab8c876262f97ls
+CaliQuake			perf-cpu-gpuRendering.trace
+CaliQuake.xcodeproj		progress
+CaliQuakeTests			pterm.py
+CaliQuakeUITests		pterm.swift
+out.txt				shell.py
+output.txt
+]697;OSCUnlock=e90b361711284ea9af1ab8c876262f97]697;Dir=/Users/oniichan/Documents/Code/CaliQuake]697;Shell=bash]697;ShellPath=/bin/bash]697;PID=19706]697;ExitCode=0]697;TTY=/dev/ttys013]697;Log=]697;User=oniichan]697;OSCLock=e90b361711284ea9af1ab8c876262f97]697;PreExec]697;StartPromptbash-3.2$ ]697;EndPrompt]697;NewCmd=e90b361711284ea9af1ab8c876262f97pwd
+/Users/oniichan/Documents/Code/CaliQuake
+]697;OSCUnlock=e90b361711284ea9af1ab8c876262f97]697;Dir=/Users/oniichan/Documents/Code/CaliQuake]697;Shell=bash]697;ShellPath=/bin/bash]697;PID=19706]697;ExitCode=0]697;TTY=/dev/ttys013]697;Log=]697;User=oniichan]697;OSCLock=e90b361711284ea9af1ab8c876262f97]697;PreExec]697;StartPromptbash-3.2$ ]697;EndPrompt]697;NewCmd=e90b361711284ea9af1ab8c876262f97python -c 'import sys; print(sys.stdout.isatty())'
+True
+]697;OSCUnlock=e90b361711284ea9af1ab8c876262f97]697;Dir=/Users/oniichan/Documents/Code/CaliQuake]697;Shell=bash]697;ShellPath=/bin/bash]697;PID=19706]697;ExitCode=0]697;TTY=/dev/ttys013]697;Log=]697;User=oniichan]697;OSCLock=e90b361711284ea9af1ab8c876262f97]697;PreExec]697;StartPromptbash-3.2$ ]697;EndPrompt]697;NewCmd=e90b361711284ea9af1ab8c876262f97exit
+exit

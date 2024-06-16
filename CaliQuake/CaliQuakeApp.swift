@@ -121,6 +121,26 @@ struct CaliQuakeApp: App {
     }
     
     func parse(_ stdout: String) -> String {
-        return stdout
+        var isEscaped = false
+        var parsed = ""
+        let esc = Character(Unicode.Scalar(0o33))
+        let bel = Character(Unicode.Scalar(0o7))
+        
+        for c in stdout {
+            if c == esc {
+                isEscaped = true
+            }
+            
+            if !isEscaped {
+                parsed.append(c)
+            }
+            
+            // shrug
+            if isEscaped && c == bel {
+                isEscaped = false
+            }
+        }
+        
+        return parsed
     }
 }
