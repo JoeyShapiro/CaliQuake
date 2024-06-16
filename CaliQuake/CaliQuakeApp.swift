@@ -47,7 +47,8 @@ struct CaliQuakeApp: App {
                         command += "\n"
                         text += keyPress.characters
                     } else if keyPress.characters == "\u{7f}" { // backspace
-                        command.removeLast()
+//                        command.removeLast()
+                        command += keyPress.characters
                         text.removeLast()
                     } else {
                         command += keyPress.characters
@@ -81,7 +82,11 @@ struct CaliQuakeApp: App {
     func startTTY() {
         pty = PseudoTerminal()
         Task {
-            await runThread1()
+            await keepWriting()
+        }
+        
+        Task {
+            await keepReading()
         }
         
 //        Task {
@@ -91,58 +96,31 @@ struct CaliQuakeApp: App {
 //        pty.close()
     }
     
-    func runThread1() async {
-        text += "Thread 2: \n"
-//        command = "python3 -c 'import sys; print(sys.stdout.isatty())'\n"
-//        text += command
-        var (data, n2) = pty!.read()
-        while n2 > 0 {
-            if let output = String(data: data, encoding: .utf8) {
-                text += output
-                if output.contains("$") {
-                    break
-                }
-            }
-            (data, n2) = pty!.read()
-            print("read \(n2)")
-        }
-        loop: while true {
-            if !command.hasSuffix("\n") {
+    func keepWriting() async {
+        var n = pty!.write(command: command)
+        while n >= 0 {
+            if command.isEmpty {
                 continue
             }
-            //            text += command
-            let n = pty!.write(command: command)
+            
+            n = pty!.write(command: command)
             command = ""
             print("wrote \(n)")
-            
-            var (data, n2) = pty!.read()
-            while n2 > 0 {
-                if let output = String(data: data, encoding: .utf8) {
-                    text += output
-                    if output.contains("$") {
-                        break
-                    }
-                    if output == "exit" {
-                        break loop
-                    }
-                }
-                (data, n2) = pty!.read()
-                print("read \(n2)")
-            }
         }
     }
     
-    func runThread2() async {
-        await MainActor.run {
-            text += "Thread 2: \n"
-            var (data, n) = pty!.read()
-            print("read \(n)")
+    func keepReading() async {
+        var (data, n) = pty!.read()
+        while n > 0 {
             if let output = String(data: data, encoding: .utf8) {
-                text += output
+                text += parse(output)
             }
-            while n > 0 {
-                (data, n) = pty!.read()
-            }
+            (data, n) = pty!.read()
+            print("read \(n)")
         }
+    }
+    
+    func parse(_ stdout: String) -> String {
+        return stdout
     }
 }
