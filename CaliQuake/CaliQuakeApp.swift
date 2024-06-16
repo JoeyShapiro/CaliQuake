@@ -55,19 +55,18 @@ struct CaliQuakeApp: App {
                     }
                     
                     // escape codes
-                    // my escapes
                     // ls colors
                     // 
                     // read / write threads
-                    // window size
                     // name
                     // write is one char at a time
-                    // look at echo on
 
                     return .handled
                 })
-                Button("Start Threads") {
-                    startThreads()
+                .onAppear() {
+                    if pty == nil {
+                        startTTY()
+                    }
                 }
         }
         .modelContainer(sharedModelContainer)
@@ -79,7 +78,7 @@ struct CaliQuakeApp: App {
                 }.menuBarExtraStyle(.window)
     }
     
-    func startThreads() {
+    func startTTY() {
         pty = PseudoTerminal()
         Task {
             await runThread1()

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PseudoTerminal {
+class PseudoTerminal {
     private var shell = "/bin/zsh".withCString(strdup)
     private var fileActions: posix_spawn_file_actions_t? = nil
     private var master: Int32 = 0
@@ -48,6 +48,12 @@ struct PseudoTerminal {
         Darwin.close(self.slave)
     }
     
+    // should go here, just in case
+    // also makes sense, shouldnt rely on caller to close it
+    deinit {
+        self.close()
+    }
+    
     func write(command: String) -> Int {
         let buf = command.data(using: .utf8)!
         
@@ -75,14 +81,28 @@ struct PseudoTerminal {
         return (data, bytesRead)
     }
     
-    mutating func close() {
+    func close() {
+        // Send the exit command to the shell
+        let exitCommand = "exit\n"
+        let exitCommandData = exitCommand.data(using: .utf8)!
+        exitCommandData.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
+            Darwin.write(self.master, ptr.baseAddress!, ptr.count)
+        }
+        
+        // Wait for the child process to terminate
+        var status: Int32 = 0
+        waitpid(pid, &status, 0)
+        
+        // Close the master file descriptor
+        Darwin.close(self.master)
+        
+        // Destroy the posix_spawn_file_actions_t structure
         posix_spawn_file_actions_destroy(&self.fileActions)
         self.fileActions?.deallocate()
         
-        Darwin.close(self.master)
-        
-        var status: Int32 = 0
-        waitpid(pid, &status, 0)
+        #if DEBUG
+            print("Closed")
+        #endif // DEBUG
     }
 }
 
