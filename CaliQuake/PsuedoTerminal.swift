@@ -108,8 +108,8 @@ class PseudoTerminal {
 
 import SwiftUI
 struct AnsiChar {
-    let char: Character
-    let fg: NSColor // Color causes crash
-    let x: Int
-    let y: Int
+    var char: Character
+    var fg: NSColor // Color causes crash
+    var x: Int
+    var y: Int
 }

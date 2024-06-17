@@ -126,27 +126,37 @@ struct CaliQuakeApp: App {
         let bel = 0o7
         var row = 0
         var col = 0
-        var curColor = NSColor.white
+        var sequence = Data()
+        var curChar = AnsiChar(char: "a", fg: .white, x: col, y: row)
         
-        for i in (0...stdout.count-1) {
+        var i = 0
+        while i < stdout.count-1 {
             if stdout[i] == esc {
                 isEsc = true
                 // good enough, until i do real parsing on whole thing
                 // esc [ 6 9 7 ;
                 //   0 1 2 3 4 5
-                isMeta = stdout[i+2] == 54 /* 6 */ &&
-                    stdout[i+3] == 57 /* 9 */ &&
-                    stdout[i+4] == 55 /* 7 */
+                i += 1 // "["
+                isMeta = stdout[i+1] == 54 /* 6 */ && stdout[i+2] == 57 /* 9 */ && stdout[i+3] == 55 /* 7 */
+                if isMeta {
+                    i += 3
+                }
+                i += 1
             }
             
             if !isEsc {
-                parsed.append(AnsiChar(char: Character(Unicode.Scalar(stdout[i])), fg: curColor, x: col, y: row))
+                curChar.char = Character(Unicode.Scalar(stdout[i]))
+                curChar.x = col
+                curChar.y = row
+                parsed.append(curChar)
                 col += 1
                 if stdout[i] == 0xa /* \n */ {
                     row += 1 // carriage return
                     col = 0  // line feed
                              // :P
                 }
+            } else {
+                sequence.append(stdout[i])
             }
             
             // its doing the auto complete, so i have to handle escapes now
@@ -155,10 +165,47 @@ struct CaliQuakeApp: App {
             if isMeta && stdout[i] == bel {
                 isEsc = false
                 isMeta = false
+                sequence.removeAll()
             }
             if isEsc && !isMeta && (stdout[i] == 109 /* m */ || stdout[i] == 104 /* h */) {
+                // parse sequence now
+                if sequence.removeLast() == 109 {
+                    let numbers = sequence.split(separator: 59 /* ; */)
+                    for number in numbers {
+                        if let str = Int(String(data: number, encoding: .utf8) ?? "-1") {
+                            print("new color:", str)
+                            switch str {
+                            case -1:
+                                print("bad")
+                            case 30:
+                                curChar.fg = .black
+                            case 31:
+                                curChar.fg = .red
+                            case 32:
+                                curChar.fg = .green
+                            case 33:
+                                curChar.fg = .yellow
+                            case 34:
+                                curChar.fg = .blue
+                            case 35:
+                                curChar.fg = .magenta
+                            case 36:
+                                curChar.fg = .cyan
+                            case 37:
+                                curChar.fg = .white
+                            case 39:
+                                curChar.fg = .white
+                            default: // 0
+                                curChar.fg = .white
+                            }
+                        }
+                    }
+                }
                 isEsc = false
+                sequence.removeAll()
             }
+            
+            i+=1
         }
         
         return parsed
