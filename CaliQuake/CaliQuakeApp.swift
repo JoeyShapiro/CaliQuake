@@ -56,9 +56,11 @@ struct CaliQuakeApp: App {
                     }
                     
                     // escape codes
-                    // ls colors
                     //
                     // name
+                    // ps info
+                    // rows
+                    // colors
 
                     return .handled
                 })
@@ -126,6 +128,7 @@ struct CaliQuakeApp: App {
         let bel = Character(Unicode.Scalar(0o7))
         var row = 0
         var col = 0
+        var curColor = NSColor.white
         
         for idx in (0...stdout.count-1) {
             let i = stdout.index(stdout.startIndex, offsetBy: idx)
@@ -139,10 +142,12 @@ struct CaliQuakeApp: App {
                 let i3 = stdout.index(i, offsetBy: 3)
                 let i4 = stdout.index(i, offsetBy: 4)
                 isMeta = stdout[i2] == "6" && stdout[i3] == "9" && stdout[i4] == "7"
+                
+                
             }
             
             if !isEsc {
-                parsed.append(AnsiChar(char: stdout[i], fg: .white, x: col, y: row))
+                parsed.append(AnsiChar(char: stdout[i], fg: curColor, x: col, y: row))
                 col += 1
                 if stdout[i] == "\n" {
                     row += 1 // carriage return

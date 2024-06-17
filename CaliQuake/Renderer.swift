@@ -136,7 +136,7 @@ class Renderer: NSObject {
         var attributes: [NSAttributedString.Key: Any] = [
             .font: font,
             .paragraphStyle: paragraphStyle,
-            .foregroundColor: NSColor.white
+            .foregroundColor: NSColor.white // if the data is not the right type, it will crash
         ]
 //        for y in (0...64) {
 //            let pos = CGPoint(x: (CGFloat(0) * font.pointSize / 1.5), y: CGFloat(CGFloat(y) * font.pointSize / 1.5))
@@ -145,7 +145,7 @@ class Renderer: NSObject {
 //        }
         
         for ac in text {
-//            attributes[.foregroundColor] = ac.fg // this causes a crash
+            attributes[.foregroundColor] = ac.fg
             let pos = CGPoint(x: (CGFloat(ac.x) * font.pointSize / 1.5), y: CGFloat(size.height-font.pointSize)-(CGFloat(ac.y) * font.pointSize / 1.5))
             let rect = CGRect(origin: pos, size: CGSize(width: font.pointSize, height: font.pointSize))
             String(ac.char).draw(in: rect, withAttributes: attributes)
