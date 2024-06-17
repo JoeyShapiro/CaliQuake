@@ -9,7 +9,7 @@ import SwiftUI
 import MetalKit
 
 struct MetalView: NSViewRepresentable {
-    @Binding public var text: String
+    @Binding public var text: [AnsiChar]
     private var coordinator: Coordinator
     
     class Coordinator: NSObject, MTKViewDelegate {
@@ -27,12 +27,12 @@ struct MetalView: NSViewRepresentable {
             renderer.draw(in: view)
         }
         
-        func update(text: String) {
+        func update(text: [AnsiChar]) {
             renderer.update(text: text)
         }
     }
     
-    init(textBinding: Binding<String>) {
+    init(textBinding: Binding<[AnsiChar]>) {
         let device = MTLCreateSystemDefaultDevice()!
         self.coordinator = Coordinator(device: device)
         self._text = textBinding

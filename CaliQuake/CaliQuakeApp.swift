@@ -23,7 +23,7 @@ struct CaliQuakeApp: App {
         }
     }()
     
-    @State public var text = ""
+    @State public var text: [AnsiChar] = []
     @State public var command = ""
     @FocusState private var focused: Bool
     @State private var pty: PseudoTerminal? = nil
@@ -118,12 +118,14 @@ struct CaliQuakeApp: App {
         }
     }
     
-    func parse(_ stdout: String) -> String {
+    func parse(_ stdout: String) -> [AnsiChar] {
         var isEsc = false
         var isMeta = false
-        var parsed = ""
+        var parsed: [AnsiChar] = []
         let esc = Character(Unicode.Scalar(0o33))
         let bel = Character(Unicode.Scalar(0o7))
+        var row = 0
+        var col = 0
         
         for idx in (0...stdout.count-1) {
             let i = stdout.index(stdout.startIndex, offsetBy: idx)
@@ -140,7 +142,13 @@ struct CaliQuakeApp: App {
             }
             
             if !isEsc {
-                parsed.append(stdout[i])
+                parsed.append(AnsiChar(char: stdout[i], fg: .white, x: col, y: row))
+                col += 1
+                if stdout[i] == "\n" {
+                    row += 1 // carriage return
+                    col = 0  // line feed
+                             // :P
+                }
             }
             
             // its doing the auto complete, so i have to handle escapes now
@@ -153,10 +161,6 @@ struct CaliQuakeApp: App {
             if isEsc && !isMeta && (stdout[i] == "m" || stdout[i] == "h") {
                 isEsc = false
             }
-        }
-        
-        for c in stdout {
-            
         }
         
         return parsed

@@ -12,7 +12,7 @@ class Renderer: NSObject {
     var pipelineState: MTLRenderPipelineState!
     var commandQueue: MTLCommandQueue!
     var vertexBuffer: MTLBuffer!
-    private var text = "$ "
+    private var text: [AnsiChar]
     private var texture: MTLTexture?
     private var isDirty = true
 
@@ -32,6 +32,7 @@ class Renderer: NSObject {
         self.pipelineState = try! device.makeRenderPipelineState(descriptor: pipelineDescriptor)
     
         self.texture = nil
+        self.text = []
 
         super.init()
     }
@@ -40,7 +41,7 @@ class Renderer: NSObject {
         // Handle size change if necessary
     }
     
-    func update(text: String) {
+    func update(text: [AnsiChar]) {
         self.text = text
         self.isDirty = true
     }
@@ -116,7 +117,7 @@ class Renderer: NSObject {
         return data as Data
     }
     
-    private func makeImage(text: String, font: NSFont, size: CGSize) -> CGImage? {
+    private func makeImage(text: [AnsiChar], font: NSFont, size: CGSize) -> CGImage? {
         // Create a bitmap context
         let scale = NSScreen.main?.backingScaleFactor ?? 1.0
         let width = Int(size.width * scale)
@@ -132,13 +133,23 @@ class Renderer: NSObject {
         // Draw the text
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .left
-        let attributes: [NSAttributedString.Key: Any] = [
+        var attributes: [NSAttributedString.Key: Any] = [
             .font: font,
             .paragraphStyle: paragraphStyle,
             .foregroundColor: NSColor.white
         ]
-        let rect = CGRect(origin: .zero, size: size)
-        text.draw(in: rect, withAttributes: attributes)
+//        for y in (0...64) {
+//            let pos = CGPoint(x: (CGFloat(0) * font.pointSize / 1.5), y: CGFloat(CGFloat(y) * font.pointSize / 1.5))
+//            let rect = CGRect(origin: pos, size: CGSize(width: font.pointSize, height: font.pointSize))
+//            String(y).draw(in: rect, withAttributes: attributes)
+//        }
+        
+        for ac in text {
+//            attributes[.foregroundColor] = ac.fg // this causes a crash
+            let pos = CGPoint(x: (CGFloat(ac.x) * font.pointSize / 1.5), y: CGFloat(size.height-font.pointSize)-(CGFloat(ac.y) * font.pointSize / 1.5))
+            let rect = CGRect(origin: pos, size: CGSize(width: font.pointSize, height: font.pointSize))
+            String(ac.char).draw(in: rect, withAttributes: attributes)
+        }
         
         NSGraphicsContext.restoreGraphicsState()
         

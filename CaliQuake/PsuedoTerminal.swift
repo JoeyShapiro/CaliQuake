@@ -106,3 +106,10 @@ class PseudoTerminal {
     }
 }
 
+import SwiftUI
+struct AnsiChar {
+    let char: Character
+    let fg: Color
+    let x: Int
+    let y: Int
+}
