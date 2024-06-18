@@ -60,7 +60,8 @@ struct CaliQuakeApp: App {
                     // name
                     // ps info
                     // rows
-                    // colors
+                    // maybe do that somewhere else, but i kinda need it
+                    // either pass in the info, or use modifiers
 
                     return .handled
                 })
@@ -112,13 +113,13 @@ struct CaliQuakeApp: App {
     func keepReading() async {
         var (data, n) = pty!.read()
         while n > 0 {
-            text += parse(data)
+            text += parse(data, row: (text.last?.y ?? 0), col: (text.last?.x ?? 0))
             (data, n) = pty!.read()
             print("read \(n)")
         }
     }
     
-    func parse(_ stdout: Data) -> [AnsiChar] {
+    func parse(_ stdout: Data, row: Int, col: Int) -> [AnsiChar] {
         var isEsc = false
         var isMeta = false
         var parsed: [AnsiChar] = []
@@ -145,16 +146,18 @@ struct CaliQuakeApp: App {
             }
             
             if !isEsc {
+                // do it here to be cleaner and handle new lines
+                col += 1
+                if stdout[i] == 0xa /* \n */ || stdout[i] == 0xd /* \r */ {
+                    col = 0  // carriage return
+                    row += 1 // line feed
+                             // :P
+                }
+                
                 curChar.char = Character(Unicode.Scalar(stdout[i]))
                 curChar.x = col
                 curChar.y = row
                 parsed.append(curChar)
-                col += 1
-                if stdout[i] == 0xa /* \n */ {
-                    row += 1 // carriage return
-                    col = 0  // line feed
-                             // :P
-                }
             } else {
                 sequence.append(stdout[i])
             }
@@ -173,7 +176,6 @@ struct CaliQuakeApp: App {
                     let numbers = sequence.split(separator: 59 /* ; */)
                     for number in numbers {
                         if let str = Int(String(data: number, encoding: .utf8) ?? "-1") {
-                            print("new color:", str)
                             switch str {
                             case -1:
                                 print("bad")
