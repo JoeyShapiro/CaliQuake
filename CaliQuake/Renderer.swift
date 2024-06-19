@@ -150,10 +150,12 @@ class Renderer: NSObject {
 //            String(y).draw(in: rect, withAttributes: attributes)
 //        }
         
+        let ratio: CGFloat = 5/3
+        let huh: CGFloat = 1.1
         for ac in text {
             attributes[.foregroundColor] = ac.fg
-            let pos = CGPoint(x: (CGFloat(ac.x) * font.pointSize) / (5/3), y: CGFloat(size.height-font.pointSize)-(CGFloat(ac.y) * font.pointSize))
-            let rect = CGRect(origin: pos, size: CGSize(width: font.pointSize, height: font.pointSize))
+            let pos = CGPoint(x: (CGFloat(ac.x) * font.pointSize) / ratio, y: CGFloat(size.height-font.pointSize)-(CGFloat(ac.y) * font.pointSize * huh))
+            let rect = CGRect(origin: pos, size: CGSize(width: font.pointSize / (5/3), height: font.pointSize * huh))
             String(ac.char).draw(in: rect, withAttributes: attributes)
         }
         
