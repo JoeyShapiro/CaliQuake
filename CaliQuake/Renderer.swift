@@ -49,7 +49,13 @@ class Renderer: NSObject {
     func draw(in view: MTKView) {
         // i changed the dimensions, removed verts, use tex coords, and changed the ordering
         if isDirty {
-            let imageData = convertCGImageToData(makeImage(text: self.text, font: NSFont.monospacedSystemFont(ofSize: 12, weight: NSFont.Weight(rawValue: 0.1)), size: CGSize(width: 512, height: 512))!)!
+            // NSFontManager
+            // NSFont.monospacedSystemFont(ofSize: 12, weight: NSFont.Weight(rawValue: 0.1))
+//            guard let font = NSFont(name: "SFMono-Regular", size: 12) else {
+//                fatalError("cannot find font")
+//            }
+            let font = NSFont.monospacedSystemFont(ofSize: 12, weight: NSFont.Weight(rawValue: 0.1))
+            let imageData = convertCGImageToData(makeImage(text: self.text, font: font, size: CGSize(width: 512, height: 512))!)!
             
             let textureLoader = MTKTextureLoader(device: view.device!)
             
@@ -146,7 +152,7 @@ class Renderer: NSObject {
         
         for ac in text {
             attributes[.foregroundColor] = ac.fg
-            let pos = CGPoint(x: (CGFloat(ac.x) * font.pointSize / 1.5), y: CGFloat(size.height-font.pointSize)-(CGFloat(ac.y) * font.pointSize / 1.5))
+            let pos = CGPoint(x: (CGFloat(ac.x) * font.pointSize) / (5/3), y: CGFloat(size.height-font.pointSize)-(CGFloat(ac.y) * font.pointSize))
             let rect = CGRect(origin: pos, size: CGSize(width: font.pointSize, height: font.pointSize))
             String(ac.char).draw(in: rect, withAttributes: attributes)
         }

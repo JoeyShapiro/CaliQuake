@@ -125,8 +125,8 @@ struct CaliQuakeApp: App {
         var parsed: [AnsiChar] = []
         let esc = 0o33
         let bel = 0o7
-        var row = 0
-        var col = 0
+        var row = row
+        var col = col
         var sequence = Data()
         var curChar = AnsiChar(char: "a", fg: .white, x: col, y: row)
         
@@ -154,7 +154,24 @@ struct CaliQuakeApp: App {
                              // :P
                 }
                 
-                curChar.char = Character(Unicode.Scalar(stdout[i]))
+                // read the unicode char
+                // TODO can i use less u32
+                // TODO can i do cleaner
+                var unicode: UInt32 = 0
+                if stdout[i] & 0b10000000 == 0 {
+                    unicode = UInt32(stdout[i])
+                } else if stdout[i] & 0b1110_0000 == 0b1100_0000 {
+                    unicode = UInt32(stdout[i] & 0b0001_1111) << 6 | UInt32(stdout[i+1] & 0b0011_1111)
+                    i += 1
+                } else if stdout[i] & 0b1111_0000 == 0b1110_0000 {
+                    unicode = UInt32(stdout[i] & 0b0000_1111) << 12 | UInt32(stdout[i+1] & 0b0011_1111) << 6 | UInt32(stdout[i+2] & 0b0011_1111)
+                    i += 2
+                } else if stdout[i] & 0b1111_1000 == 0b1111_0000 {
+                    unicode = UInt32(stdout[i] & 0b0000_0111) << 18 | UInt32(stdout[i+1] & 0b0011_1111) << 12 | UInt32(stdout[i+2] & 0b0011_1111) << 6 | UInt32(stdout[i+3] & 0b0011_1111)
+                    i += 3
+                }
+                
+                curChar.char = Character(UnicodeScalar(unicode)!)
                 curChar.x = col
                 curChar.y = row
                 parsed.append(curChar)
