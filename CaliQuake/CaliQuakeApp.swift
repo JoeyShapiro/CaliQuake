@@ -23,10 +23,17 @@ struct CaliQuakeApp: App {
         }
     }()
     
+    /*
+     "as your app might get killed on the real device as well without those triggers. IMO, it's a mistake to build code to handle this scenario into the app (more a design mistake)" - stack overflow guy
+     grr
+     nothing i can do
+     */
+    
     @State public var text: [AnsiChar] = []
     @State public var command = ""
     @FocusState private var focused: Bool
     @State private var pty: PseudoTerminal? = nil
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
         WindowGroup {
@@ -70,6 +77,9 @@ struct CaliQuakeApp: App {
                         startTTY()
                     }
                 }
+//                .alert("Important message", isPresented: $show) {
+//                    Button("OK") { }
+//                }
         }
         .modelContainer(sharedModelContainer)
         MenuBarExtra(
@@ -81,7 +91,10 @@ struct CaliQuakeApp: App {
     }
     
     func startTTY() {
-        pty = PseudoTerminal()
+        // TODO best i can think of
+        appDelegate.pty = PseudoTerminal()
+        pty = appDelegate.pty
+        
         Task {
             await keepWriting()
         }

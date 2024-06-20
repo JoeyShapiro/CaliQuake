@@ -20,6 +20,7 @@
 		CD30896B2C1BC97800FD5F84 /* MetalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD30896A2C1BC97800FD5F84 /* MetalView.swift */; };
 		CD30896D2C1BC98E00FD5F84 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD30896C2C1BC98E00FD5F84 /* Renderer.swift */; };
 		CD30896F2C1CE5B200FD5F84 /* PsuedoTerminal.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD30896E2C1CE5B200FD5F84 /* PsuedoTerminal.swift */; };
+		CD876DBD2C23B68B0072A58E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD876DBC2C23B68B0072A58E /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 		CD30896A2C1BC97800FD5F84 /* MetalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalView.swift; sourceTree = "<group>"; };
 		CD30896C2C1BC98E00FD5F84 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		CD30896E2C1CE5B200FD5F84 /* PsuedoTerminal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsuedoTerminal.swift; sourceTree = "<group>"; };
+		CD876DBC2C23B68B0072A58E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 				CD30896A2C1BC97800FD5F84 /* MetalView.swift */,
 				CD30896C2C1BC98E00FD5F84 /* Renderer.swift */,
 				CD30896E2C1CE5B200FD5F84 /* PsuedoTerminal.swift */,
+				CD876DBC2C23B68B0072A58E /* AppDelegate.swift */,
 			);
 			path = CaliQuake;
 			sourceTree = "<group>";
@@ -284,6 +287,7 @@
 				CD03116C2C135C620076443C /* ContentView.swift in Sources */,
 				CD03116E2C135C620076443C /* Item.swift in Sources */,
 				CD03116A2C135C620076443C /* CaliQuakeApp.swift in Sources */,
+				CD876DBD2C23B68B0072A58E /* AppDelegate.swift in Sources */,
 				CD3089692C1A928C00FD5F84 /* starter.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
