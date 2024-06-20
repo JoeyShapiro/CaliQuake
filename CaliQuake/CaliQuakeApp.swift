@@ -13,6 +13,7 @@ struct CaliQuakeApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
+            AppState.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -94,6 +95,24 @@ struct CaliQuakeApp: App {
         // TODO best i can think of
         appDelegate.pty = PseudoTerminal()
         pty = appDelegate.pty
+        
+        // kill the prev
+        do {
+            if let state = try sharedModelContainer.mainContext.fetch(FetchDescriptor<AppState>()).first {
+                if state.childpty > 0 {
+                    _ = pty?.write(command: "kill \(state.childpty)\n")
+                }
+            }
+        } catch {
+            
+        }
+        
+        sharedModelContainer.mainContext.insert(AppState(child: pty?.pid ?? 0))
+        do {
+            try sharedModelContainer.mainContext.save()
+        } catch {
+            print("failed")
+        }
         
         Task {
             await keepWriting()

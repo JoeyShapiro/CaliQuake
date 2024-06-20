@@ -12,7 +12,7 @@ class PseudoTerminal {
     private var fileActions: posix_spawn_file_actions_t? = nil
     private var master: Int32 = 0
     private var slave: Int32 = 0
-    private var pid: pid_t
+    public var pid: pid_t
     
     init() {
         var environment: [String: String] = ProcessInfo.processInfo.environment

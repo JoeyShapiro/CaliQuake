@@ -18,6 +18,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationWillTerminate(_ notification: Notification) {
         print("hello from delegate \(notification)")
+        self.pty?.close()
     }
     
     func setupSignalHandlers() {
