@@ -35,14 +35,35 @@ struct CaliQuakeApp: App {
     @FocusState private var focused: Bool
     @State private var pty: PseudoTerminal? = nil
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @State var isPopover = false
+    @State var popPos = CGPoint()
+    @State var popAC = AnsiChar(char: "?", fg: .clear, x: -1, y: -1)
+    let fontRatio: CGFloat = 5/3
+    let fontHuh: CGFloat = 1.1
+    let font = NSFont.monospacedSystemFont(ofSize: 12, weight: NSFont.Weight(rawValue: 0.1))
 
     var body: some Scene {
         WindowGroup {
-            MetalView(textBinding: $text)
+            MetalView(textBinding: $text, font: font)
                 .frame(width: 500, height: 500)
                 .focusable()
                 .focused($focused)
                 .focusEffectDisabled()
+                .onTapGesture { location in
+                    #if DEBUG
+                        popPos = location
+                        let x = Int(popPos.x / font.pointSize * fontRatio)
+                        let y = Int(popPos.y / font.pointSize / fontHuh)
+                        if let ac = text.first(where: { ac in
+                            return ac.x == x && ac.y == y
+                        }) {
+                            popAC = ac
+                            isPopover = true
+                        } else {
+                            isPopover = false
+                        }
+                    #endif
+                }
                 .onKeyPress(action: { keyPress in
                     print("""
                         New key event:
@@ -90,6 +111,13 @@ struct CaliQuakeApp: App {
 //                .alert("Important message", isPresented: $show) {
 //                    Button("OK") { }
 //                }
+                .popover(isPresented: $isPopover,  attachmentAnchor: .rect(.rect(CGRect(x: popPos.x, y: popPos.y, width: 0, height: 0)))) {
+                    // TODO unknown value
+                    let value = popAC.char.unicodeScalars.first?.value ?? UInt32(0.0)
+                    Text("char: \"\(popAC.char)\" (\(value))")
+                    Text("fg: \(popAC.fg)")
+                    Text("pos: (\(popAC.x), \(popAC.y))")
+            }
         }
         .modelContainer(sharedModelContainer)
         MenuBarExtra(

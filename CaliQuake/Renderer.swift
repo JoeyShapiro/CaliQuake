@@ -15,8 +15,11 @@ class Renderer: NSObject {
     private var text: [AnsiChar]
     private var texture: MTLTexture?
     private var isDirty = true
+    let ratio: CGFloat = 5/3
+    let huh: CGFloat = 1.1
+    let font: NSFont
 
-    init(device: MTLDevice) {
+    init(device: MTLDevice, font: NSFont) {
         self.device = device
         self.commandQueue = device.makeCommandQueue()
 
@@ -33,6 +36,8 @@ class Renderer: NSObject {
     
         self.texture = nil
         self.text = []
+        
+        self.font = font
 
         super.init()
     }
@@ -54,8 +59,7 @@ class Renderer: NSObject {
 //            guard let font = NSFont(name: "SFMono-Regular", size: 12) else {
 //                fatalError("cannot find font")
 //            }
-            let font = NSFont.monospacedSystemFont(ofSize: 12, weight: NSFont.Weight(rawValue: 0.1))
-            let imageData = convertCGImageToData(makeImage(text: self.text, font: font, size: CGSize(width: 512, height: 512))!)!
+            let imageData = convertCGImageToData(makeImage(text: self.text, font: self.font, size: CGSize(width: 512, height: 512))!)!
             
             let textureLoader = MTKTextureLoader(device: view.device!)
             
@@ -150,13 +154,17 @@ class Renderer: NSObject {
 //            String(y).draw(in: rect, withAttributes: attributes)
 //        }
         
-        let ratio: CGFloat = 5/3
-        let huh: CGFloat = 1.1
         for ac in text {
             attributes[.foregroundColor] = ac.fg
             let pos = CGPoint(x: (CGFloat(ac.x) * font.pointSize) / ratio, y: CGFloat(size.height-font.pointSize)-(CGFloat(ac.y) * font.pointSize * huh))
             let rect = CGRect(origin: pos, size: CGSize(width: font.pointSize / (5/3), height: font.pointSize * huh))
             String(ac.char).draw(in: rect, withAttributes: attributes)
+            
+            #if DEBUG
+                context.setStrokeColor(NSColor.red.cgColor)  // Set border color
+                context.setLineWidth(0.2)  // Set border width
+                context.stroke(rect)
+            #endif
         }
         
         NSGraphicsContext.restoreGraphicsState()

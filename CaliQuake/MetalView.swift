@@ -15,8 +15,8 @@ struct MetalView: NSViewRepresentable {
     class Coordinator: NSObject, MTKViewDelegate {
         var renderer: Renderer
         
-        init(device: MTLDevice) {
-            self.renderer = Renderer(device: device)
+        init(device: MTLDevice, font: NSFont) {
+            self.renderer = Renderer(device: device, font: font)
         }
         
         func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
@@ -32,9 +32,9 @@ struct MetalView: NSViewRepresentable {
         }
     }
     
-    init(textBinding: Binding<[AnsiChar]>) {
+    init(textBinding: Binding<[AnsiChar]>, font: NSFont) {
         let device = MTLCreateSystemDefaultDevice()!
-        self.coordinator = Coordinator(device: device)
+        self.coordinator = Coordinator(device: device, font: font)
         self._text = textBinding
     }
 
