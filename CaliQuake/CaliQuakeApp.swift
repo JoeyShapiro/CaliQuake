@@ -44,13 +44,66 @@ struct CaliQuakeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MetalView(textBinding: $text, font: font)
-                .frame(width: 500, height: 500)
-                .focusable()
-                .focused($focused)
-                .focusEffectDisabled()
-                .onTapGesture { location in
-                    #if DEBUG
+            ZStack {
+                MetalView(textBinding: $text, font: font)
+                    .frame(width: 500, height: 500)
+                    .focusable()
+                    .focused($focused)
+                    .focusEffectDisabled()
+                    .onKeyPress(action: { keyPress in
+                        print("""
+                        New key event:
+                        Key: \(keyPress.characters)
+                        Modifiers: \(keyPress.modifiers)
+                        Phase: \(keyPress.phase)
+                        Debug description: \(keyPress.debugDescription)
+                    """)
+                        if keyPress.characters == "\r" || keyPress.characters == "\n" {
+                            command += "\n"
+                            //                        text += keyPress.characters
+                        } else if keyPress.characters == "\u{7f}" { // backspace
+                            //                        command.removeLast()
+                            command += keyPress.characters
+                            //                        text.removeLast()
+                        } else {
+                            command += keyPress.characters
+                            //                        text += keyPress.characters // the keys are duping or somthing
+                        }
+                        
+                        // i think this makes more sense
+                        // i know when to write
+                        // unless its something special, but i can still handle that
+                        if !command.isEmpty {
+                            let n = pty!.write(command: command)
+                            command = ""
+                            print("wrote \(n)")
+                        }
+                        
+                        // escape codes
+                        //
+                        // name
+                        // ps info
+                        // rows
+                        // maybe do that somewhere else, but i kinda need it
+                        // either pass in the info, or use modifiers
+                        
+                        return .handled
+                    })
+                    .onAppear() {
+                        if pty == nil {
+                            startTTY()
+                        }
+                    }
+                //                .alert("Important message", isPresented: $show) {
+                //                    Button("OK") { }
+                //                }
+                // the popover makes the view no longer redraw
+                // opacity of zero means i cant click it. and cant do Double.Min
+                Rectangle()
+                    .foregroundColor(Color.black.opacity(0.001))
+                    .frame(width: 500, height: 500)
+                    .onTapGesture { location in
+#if DEBUG
                         popPos = location
                         let x = Int(popPos.x / font.pointSize * fontRatio)
                         let y = Int(popPos.y / font.pointSize / fontHuh)
@@ -62,61 +115,15 @@ struct CaliQuakeApp: App {
                         } else {
                             isPopover = false
                         }
-                    #endif
-                }
-                .onKeyPress(action: { keyPress in
-                    print("""
-                        New key event:
-                        Key: \(keyPress.characters)
-                        Modifiers: \(keyPress.modifiers)
-                        Phase: \(keyPress.phase)
-                        Debug description: \(keyPress.debugDescription)
-                    """)
-                    if keyPress.characters == "\r" || keyPress.characters == "\n" {
-                        command += "\n"
-//                        text += keyPress.characters
-                    } else if keyPress.characters == "\u{7f}" { // backspace
-//                        command.removeLast()
-                        command += keyPress.characters
-//                        text.removeLast()
-                    } else {
-                        command += keyPress.characters
-//                        text += keyPress.characters // the keys are duping or somthing
+#endif
                     }
-                    
-                    // i think this makes more sense
-                    // i know when to write
-                    // unless its something special, but i can still handle that
-                    if !command.isEmpty {
-                        let n = pty!.write(command: command)
-                        command = ""
-                        print("wrote \(n)")
+                    .popover(isPresented: $isPopover,  attachmentAnchor: .rect(.rect(CGRect(x: popPos.x, y: popPos.y, width: 0, height: 0)))) {
+                        // TODO unknown value
+                        let value = popAC.char.unicodeScalars.first?.value ?? UInt32(0.0)
+                        Text("char: \"\(popAC.char)\" (\(value))")
+                        Text("fg: \(popAC.fg)")
+                        Text("pos: (\(popAC.x), \(popAC.y))")
                     }
-                    
-                    // escape codes
-                    //
-                    // name
-                    // ps info
-                    // rows
-                    // maybe do that somewhere else, but i kinda need it
-                    // either pass in the info, or use modifiers
-
-                    return .handled
-                })
-                .onAppear() {
-                    if pty == nil {
-                        startTTY()
-                    }
-                }
-//                .alert("Important message", isPresented: $show) {
-//                    Button("OK") { }
-//                }
-                .popover(isPresented: $isPopover,  attachmentAnchor: .rect(.rect(CGRect(x: popPos.x, y: popPos.y, width: 0, height: 0)))) {
-                    // TODO unknown value
-                    let value = popAC.char.unicodeScalars.first?.value ?? UInt32(0.0)
-                    Text("char: \"\(popAC.char)\" (\(value))")
-                    Text("fg: \(popAC.fg)")
-                    Text("pos: (\(popAC.x), \(popAC.y))")
             }
         }
         .modelContainer(sharedModelContainer)
