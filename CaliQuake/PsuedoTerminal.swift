@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Dispatch
 
 class PseudoTerminal {
     private var shell = "/bin/zsh".withCString(strdup)
@@ -68,15 +69,32 @@ class PseudoTerminal {
         var data = Data()
         let bufferSize = 1024
         var buffer = [UInt8](repeating: 0, count: bufferSize)
+        var bytesRead = 0
+        // TODO have to do it this way. but see if i can move this out
+        // i did want pty to handle the threading though
+        let queue = DispatchQueue(label: "com.JoeyShapiro.PsuedoTerminal.read")
+        let source = DispatchSource.makeReadSource(fileDescriptor: self.master, queue: queue)
         
-        let bytesRead = Darwin.read(self.master, &buffer, bufferSize)
-        data.append(buffer, count: bytesRead)
-        
-        if let output = String(data: data, encoding: .utf8) {
-            print("Output from shell:\n\(output)")
-        } else {
-            print("Error decoding output data")
+        source.setEventHandler {
+            bytesRead = Darwin.read(self.master, &buffer, bufferSize)
+            data.append(buffer, count: bytesRead)
+            
+            if bytesRead > 0 {
+                if let output = String(data: data, encoding: .utf8) {
+                    print("Output from shell:\n\(output)")
+                } else {
+                    print("Error decoding output data")
+                }
+            } else if bytesRead == 0 {
+                // End of file
+                source.cancel()
+            } else {
+                // Error occurred
+                source.cancel()
+            }
         }
+        
+        source.resume()
         
         return (data, bytesRead)
     }

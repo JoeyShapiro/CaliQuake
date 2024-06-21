@@ -38,7 +38,8 @@ struct CaliQuakeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MetalView(textBinding: $text)
+//            MetalView(textBinding: $text)
+            EmptyView()
                 .frame(width: 500, height: 500)
                 .focusable()
                 .focused($focused)
@@ -61,6 +62,15 @@ struct CaliQuakeApp: App {
                     } else {
                         command += keyPress.characters
 //                        text += keyPress.characters // the keys are duping or somthing
+                    }
+                    
+                    // i think this makes more sense
+                    // i know when to write
+                    // unless its something special, but i can still handle that
+                    if !command.isEmpty {
+                        let n = pty!.write(command: command)
+                        command = ""
+                        print("wrote \(n)")
                     }
                     
                     // escape codes
@@ -114,13 +124,7 @@ struct CaliQuakeApp: App {
             print("failed")
         }
         
-        Task {
-            await keepWriting()
-        }
-        
-        Task {
-            await keepReading()
-        }
+        keepReading()
         
 //        Task {
 //            await runThread2()
@@ -129,20 +133,7 @@ struct CaliQuakeApp: App {
 //        pty.close()
     }
     
-    func keepWriting() async {
-        var n = pty!.write(command: command)
-        while n >= 0 {
-            if command.isEmpty {
-                continue
-            }
-            
-            n = pty!.write(command: command)
-            command = ""
-            print("wrote \(n)")
-        }
-    }
-    
-    func keepReading() async {
+    func keepReading() {
         var (data, n) = pty!.read()
         while n > 0 {
             text += parse(data, row: (text.last?.y ?? 0), col: (text.last?.x ?? 0))
