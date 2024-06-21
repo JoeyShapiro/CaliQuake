@@ -65,38 +65,44 @@ class PseudoTerminal {
         return n
     }
     
-    func read() -> (Data, Int) {
+    func read() async throws -> (Data, Int) {
         var data = Data()
         let bufferSize = 1024
         var buffer = [UInt8](repeating: 0, count: bufferSize)
         var bytesRead = 0
         // TODO have to do it this way. but see if i can move this out
         // i did want pty to handle the threading though
-        let queue = DispatchQueue(label: "com.JoeyShapiro.PsuedoTerminal.read")
-        let source = DispatchSource.makeReadSource(fileDescriptor: self.master, queue: queue)
-        
-        source.setEventHandler {
-            bytesRead = Darwin.read(self.master, &buffer, bufferSize)
-            data.append(buffer, count: bytesRead)
+        return try await withCheckedThrowingContinuation { continuation in
+            let queue = DispatchQueue(label: "com.JoeyShapiro.PsuedoTerminal.read")
+            let source = DispatchSource.makeReadSource(fileDescriptor: self.master, queue: queue)
             
-            if bytesRead > 0 {
-                if let output = String(data: data, encoding: .utf8) {
-                    print("Output from shell:\n\(output)")
+            source.setEventHandler {
+                bytesRead = Darwin.read(self.master, &buffer, bufferSize)
+                
+                if bytesRead > 0 {
+                    data.append(buffer, count: bytesRead)
+                    #if DEBUG
+                        if let output = String(data: data, encoding: .utf8) {
+                            print("Output from shell:\n\(output)")
+                        } else {
+                            print("Error decoding output data")
+                        }
+                    #endif
+                    
+                    source.cancel()
+                    continuation.resume(returning: (data, bytesRead))
                 } else {
-                    print("Error decoding output data")
+                    source.cancel()
+                    if bytesRead == 0 {
+                        continuation.resume(returning: (data, bytesRead))
+                    } else {
+                        continuation.resume(throwing: NSError(domain: "FileReaderError", code: 2, userInfo: [NSLocalizedDescriptionKey: "Error reading file"]))
+                    }
                 }
-            } else if bytesRead == 0 {
-                // End of file
-                source.cancel()
-            } else {
-                // Error occurred
-                source.cancel()
             }
+            
+            source.resume()
         }
-        
-        source.resume()
-        
-        return (data, bytesRead)
     }
     
     func close() {

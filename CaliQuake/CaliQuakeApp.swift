@@ -38,8 +38,7 @@ struct CaliQuakeApp: App {
 
     var body: some Scene {
         WindowGroup {
-//            MetalView(textBinding: $text)
-            EmptyView()
+            MetalView(textBinding: $text)
                 .frame(width: 500, height: 500)
                 .focusable()
                 .focused($focused)
@@ -124,20 +123,26 @@ struct CaliQuakeApp: App {
             print("failed")
         }
         
-        keepReading()
-        
-//        Task {
-//            await runThread2()
-//        }
-        
-//        pty.close()
+        Task{
+            await keepReading()
+        }
     }
     
-    func keepReading() {
-        var (data, n) = pty!.read()
+    func keepReading() async {
+        var n = 0
+        var data = Data()
+        do {
+            (data, n) = try await pty!.read()
+        } catch {
+            
+        }
         while n > 0 {
             text += parse(data, row: (text.last?.y ?? 0), col: (text.last?.x ?? 0))
-            (data, n) = pty!.read()
+            do {
+                (data, n) = try await pty!.read()
+            } catch {
+                
+            }
             print("read \(n)")
         }
     }
