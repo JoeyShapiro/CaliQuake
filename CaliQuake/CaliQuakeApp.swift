@@ -35,18 +35,16 @@ struct CaliQuakeApp: App {
     @FocusState private var focused: Bool
     @State private var pty: PseudoTerminal? = nil
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @State var isPopover = false
-    @State var popPos = CGPoint()
-    @State var popAC = AnsiChar(char: "?", fg: .clear, x: -1, y: -1)
     let fontRatio: CGFloat = 5/3
     let fontHuh: CGFloat = 1.1
     let font = NSFont.monospacedSystemFont(ofSize: 12, weight: NSFont.Weight(rawValue: 0.1))
-
+    @State var size = 500.0
+    
     var body: some Scene {
         WindowGroup {
             ZStack {
                 MetalView(textBinding: $text, font: font)
-                    .frame(width: 500, height: 500)
+                    .frame(width: size, height: size)
                     .focusable()
                     .focused($focused)
                     .focusEffectDisabled()
@@ -94,36 +92,11 @@ struct CaliQuakeApp: App {
                             startTTY()
                         }
                     }
+                // getting the location causes a re-init
+                PopView(fontHuh: fontHuh, fontRatio: fontRatio, text: $text, pointSize: font.pointSize)
                 //                .alert("Important message", isPresented: $show) {
                 //                    Button("OK") { }
                 //                }
-                // the popover makes the view no longer redraw
-                // opacity of zero means i cant click it. and cant do Double.Min
-                Rectangle()
-                    .foregroundColor(Color.black.opacity(0.001))
-                    .frame(width: 500, height: 500)
-                    .onTapGesture { location in
-#if DEBUG
-                        popPos = location
-                        let x = Int(popPos.x / font.pointSize * fontRatio)
-                        let y = Int(popPos.y / font.pointSize / fontHuh)
-                        if let ac = text.first(where: { ac in
-                            return ac.x == x && ac.y == y
-                        }) {
-                            popAC = ac
-                            isPopover = true
-                        } else {
-                            isPopover = false
-                        }
-#endif
-                    }
-                    .popover(isPresented: $isPopover,  attachmentAnchor: .rect(.rect(CGRect(x: popPos.x, y: popPos.y, width: 0, height: 0)))) {
-                        // TODO unknown value
-                        let value = popAC.char.unicodeScalars.first?.value ?? UInt32(0.0)
-                        Text("char: \"\(popAC.char)\" (\(value))")
-                        Text("fg: \(popAC.fg)")
-                        Text("pos: (\(popAC.x), \(popAC.y))")
-                    }
             }
         }
         .modelContainer(sharedModelContainer)

@@ -22,6 +22,7 @@
 		CD30896F2C1CE5B200FD5F84 /* PsuedoTerminal.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD30896E2C1CE5B200FD5F84 /* PsuedoTerminal.swift */; };
 		CD876DBD2C23B68B0072A58E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD876DBC2C23B68B0072A58E /* AppDelegate.swift */; };
 		CD876DBF2C23BEA40072A58E /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD876DBE2C23BEA40072A58E /* AppState.swift */; };
+		CD876DC32C265DF80072A58E /* PopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD876DC22C265DF80072A58E /* PopView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 		CD30896E2C1CE5B200FD5F84 /* PsuedoTerminal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsuedoTerminal.swift; sourceTree = "<group>"; };
 		CD876DBC2C23B68B0072A58E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CD876DBE2C23BEA40072A58E /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		CD876DC22C265DF80072A58E /* PopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +126,7 @@
 				CD30896E2C1CE5B200FD5F84 /* PsuedoTerminal.swift */,
 				CD876DBC2C23B68B0072A58E /* AppDelegate.swift */,
 				CD876DBE2C23BEA40072A58E /* AppState.swift */,
+				CD876DC22C265DF80072A58E /* PopView.swift */,
 			);
 			path = CaliQuake;
 			sourceTree = "<group>";
@@ -285,6 +288,7 @@
 			files = (
 				CD30896D2C1BC98E00FD5F84 /* Renderer.swift in Sources */,
 				CD876DBF2C23BEA40072A58E /* AppState.swift in Sources */,
+				CD876DC32C265DF80072A58E /* PopView.swift in Sources */,
 				CD0311972C135DAD0076443C /* CaliMenuExtra.swift in Sources */,
 				CD30896B2C1BC97800FD5F84 /* MetalView.swift in Sources */,
 				CD30896F2C1CE5B200FD5F84 /* PsuedoTerminal.swift in Sources */,
