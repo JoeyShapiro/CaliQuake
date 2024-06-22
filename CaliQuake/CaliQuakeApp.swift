@@ -182,14 +182,6 @@ struct CaliQuakeApp: App {
             }
             
             if !isEsc {
-                // do it here to be cleaner and handle new lines
-                col += 1
-                if stdout[i] == 0xa /* \n */ || stdout[i] == 0xd /* \r */ {
-                    col = 0  // carriage return
-                    row += 1 // line feed
-                             // :P
-                }
-                
                 // read the unicode char
                 // TODO can i use less u32
                 // TODO can i do cleaner
@@ -210,7 +202,22 @@ struct CaliQuakeApp: App {
                 curChar.char = Character(UnicodeScalar(unicode)!)
                 curChar.x = col
                 curChar.y = row
+
                 parsed.append(curChar)
+                col += 1
+                
+                // do action after placing it
+                if stdout[i] == 0xd /* \r */ && stdout[i+1] == 0xa /* \n */ {
+                    col = 0  // carriage return
+                    row += 1 // line feed
+                    i += 1   // :P
+                } else if stdout[i] == 0xa /* \n */ {
+                    col = 0
+                    row += 1
+                } else if stdout[i] == 0xd /* \r */ {
+                    col = 0
+                    row += 1
+                }
             } else {
                 sequence.append(stdout[i])
             }

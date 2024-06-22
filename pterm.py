@@ -4,7 +4,7 @@ import signal
 import time
 import select
 
-SHELL = 'bash'
+SHELL = 'zsh'
 
 def read_from_pty(master_fd):
     """Read output from the master side of the PTY and print it."""
@@ -14,6 +14,8 @@ def read_from_pty(master_fd):
             try:
                 output = os.read(master_fd, 1024)
                 print(output.decode('utf-8'), end='')
+                with open('output.txt', 'ab') as f:
+                    f.write(output)
                 if b'EndPrompt' in output:
                     break
                 if not output:
