@@ -16,8 +16,9 @@ struct PopView: View {
     @State public var visible: Bool
     @State var popAC = AnsiChar(char: "�", fg: .clear, x: -1, y: -1, width: 1)
     @Binding var text: [AnsiChar]
+    @Binding var debug: Bool
     
-    init(fontHuh: CGFloat, fontRatio: CGFloat, text: Binding<[AnsiChar]>, pointSize: CGFloat) {
+    init(fontHuh: CGFloat, fontRatio: CGFloat, text: Binding<[AnsiChar]>, pointSize: CGFloat, debug: Binding<Bool>) {
         self.popPos = CGPoint(x: -1.0, y: -1.0)
         self.visible = false
         self._text = text
@@ -25,6 +26,7 @@ struct PopView: View {
         self.fontHuh = fontHuh
         self.fontRatio = fontRatio
         self.pointSize = pointSize
+        self._debug = debug
     }
     
     var body: some View {
@@ -37,16 +39,18 @@ struct PopView: View {
                         .onEnded { value in
                             popPos = value.location
 #if DEBUG
-                            // TODO kinda want on drage and stuff, but that may lead back to start
-                            let x = Int(popPos.x / self.pointSize * self.fontRatio)
-                            let y = Int(popPos.y / self.pointSize / self.fontHuh)
-                            if let ac = self.text.first(where: { ac in
-                                return ac.x == x && ac.y == y
-                            }) {
-                                popAC = ac
-                                visible = true
-                            } else {
-                                visible = false
+                            if debug {
+                                // TODO kinda want on drage and stuff, but that may lead back to start
+                                let x = Int(popPos.x / self.pointSize * self.fontRatio)
+                                let y = Int(popPos.y / self.pointSize / self.fontHuh)
+                                if let ac = self.text.first(where: { ac in
+                                    return ac.x == x && ac.y == y
+                                }) {
+                                    popAC = ac
+                                    visible = true
+                                } else {
+                                    visible = false
+                                }
                             }
 #endif
                         }

@@ -99,7 +99,7 @@ struct CaliQuakeApp: App {
                         }
                     }
                 // getting the location causes a re-init
-                PopView(fontHuh: fontHuh, fontRatio: fontRatio, text: $text, pointSize: font.pointSize)
+                PopView(fontHuh: fontHuh, fontRatio: fontRatio, text: $text, pointSize: font.pointSize, debug: $isDebug)
                 //                .alert("Important message", isPresented: $show) {
                 //                    Button("OK") { }
                 //                }
