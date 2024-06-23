@@ -9,21 +9,22 @@ import Foundation
 import Dispatch
 
 class PseudoTerminal {
-    private var shell = "/bin/zsh".withCString(strdup)
+    private var shell = "/bin/bash".withCString(strdup)
     private var fileActions: posix_spawn_file_actions_t? = nil
     private var master: Int32 = 0
     private var slave: Int32 = 0
     public var pid: pid_t
     
-    init() {
+    init(rows: Int, cols: Int) {
         var environment: [String: String] = ProcessInfo.processInfo.environment
         environment["PATH"] = getenv("PATH").flatMap { String(cString: $0) } ?? ""
         
         posix_spawn_file_actions_init(&self.fileActions)
         
         var winp: winsize = winsize()
-        winp.ws_row = 24
-        winp.ws_col = 80
+        // TODO bad values
+        winp.ws_row = UInt16(rows)
+        winp.ws_col = UInt16(cols)
         let result = openpty(&master, &slave, nil, nil, &winp)
         if result != 0 {
             fatalError("Error creating pseudo-terminal: \(result)")
@@ -31,8 +32,9 @@ class PseudoTerminal {
         
         var term: termios = termios()
         tcgetattr(self.master, &term)
-        term.c_lflag &= ~UInt(ECHO | ECHOCTL)
+//        term.c_lflag &= ~UInt(ECHO | ECHOCTL)
         tcsetattr(self.master, TCSAFLUSH, &term)
+        print(term)
         
         posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDIN_FILENO)
         posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDOUT_FILENO)
@@ -83,7 +85,16 @@ class PseudoTerminal {
                     data.append(buffer, count: bytesRead)
                     #if DEBUG
                         if let output = String(data: data, encoding: .utf8) {
-                            print("Output from shell:\n\(output)")
+                            print("\"", terminator: "")
+                            for c in output {
+                                let val = c.unicodeScalars.first?.value ?? 0
+                                if !c.isWhitespace {
+                                    print(c, terminator: "")
+                                } else {
+                                    print("\\u\(val)", terminator: "")
+                                }
+                            }
+                            print("\"")
                         } else {
                             print("Error decoding output data")
                         }

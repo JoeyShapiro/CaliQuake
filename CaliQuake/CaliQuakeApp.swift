@@ -110,7 +110,7 @@ struct CaliQuakeApp: App {
     
     func startTTY() {
         // TODO best i can think of
-        appDelegate.pty = PseudoTerminal()
+        appDelegate.pty = PseudoTerminal(rows: 24, cols: 80)
         pty = appDelegate.pty
         
         // kill the prev
@@ -145,7 +145,7 @@ struct CaliQuakeApp: App {
             
         }
         while n > 0 {
-            text += parse(data, row: (text.last?.y ?? 0), col: (text.last?.x ?? 0))
+            text += parse(data, y: (text.last?.y ?? 0), x: (text.last?.x ?? -1))
             do {
                 (data, n) = try await pty!.read()
             } catch {
@@ -155,19 +155,20 @@ struct CaliQuakeApp: App {
         }
     }
     
-    func parse(_ stdout: Data, row: Int, col: Int) -> [AnsiChar] {
+    // using all of prev char could be useful
+    func parse(_ stdout: Data, y: Int, x: Int) -> [AnsiChar] {
         var isEsc = false
         var isMeta = false
         var parsed: [AnsiChar] = []
         let esc = 0o33
         let bel = 0o7
-        var row = row
-        var col = col
+        var row = y
+        var col = x+1
         var sequence = Data()
         var curChar = AnsiChar(char: "a", fg: .white, x: col, y: row)
         
         var i = 0
-        while i < stdout.count-1 {
+        while i < stdout.count {
             if stdout[i] == esc {
                 isEsc = true
                 // good enough, until i do real parsing on whole thing
@@ -207,14 +208,21 @@ struct CaliQuakeApp: App {
                 col += 1
                 
                 // do action after placing it
-                if stdout[i] == 0xd /* \r */ && stdout[i+1] == 0xa /* \n */ {
-                    col = 0  // carriage return
-                    row += 1 // line feed
-                    i += 1   // :P
+                if stdout[i] == 0xd /* \r */ {
+                    col = 0
+                    row += 1
+                    
+                    // ¯\_(ツ)_/¯
+                    if i+1 < stdout.count && stdout[i+1] == 0xa /* \n */ {
+                        i += 1
+                    }
                 } else if stdout[i] == 0xa /* \n */ {
                     col = 0
                     row += 1
-                } else if stdout[i] == 0xd /* \r */ {
+                }
+                
+                // handle window size
+                if col > 80 {
                     col = 0
                     row += 1
                 }

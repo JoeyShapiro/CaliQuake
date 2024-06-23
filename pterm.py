@@ -4,7 +4,7 @@ import signal
 import time
 import select
 
-SHELL = 'zsh'
+SHELL = 'bash'
 
 def read_from_pty(master_fd):
     """Read output from the master side of the PTY and print it."""
@@ -14,7 +14,7 @@ def read_from_pty(master_fd):
             try:
                 output = os.read(master_fd, 1024)
                 print(output.decode('utf-8'), end='')
-                with open('output.txt', 'ab') as f:
+                with open(f'output.{SHELL}.txt', 'ab') as f:
                     f.write(output)
                 if b'EndPrompt' in output:
                     break
@@ -29,6 +29,7 @@ def write_to_pty(master_fd, input_str):
     os.write(master_fd, input_str.encode('utf-8'))
 
 def main():
+    print("Running PTY...")
     # Fork the current process
     pid, master_fd = pty.fork()
 
@@ -38,6 +39,7 @@ def main():
         print("Child PID is", os.getpid())
         os.execlp(SHELL, SHELL)
     else:
+        print("Parent PID is", os.getpid())
         # Parent process
         try:
             # Set the parent process to ignore SIGCHLD to prevent zombie processes
@@ -51,6 +53,15 @@ def main():
                 "python -c 'import sys; print(sys.stdout.isatty())'\n"
                 "exit\n",
             ]
+
+            # get the termios structure
+            import termios
+            attr = termios.tcgetattr(master_fd)
+            print(attr)
+            """
+            [11010, 3, 19200, 1483, 9600, 9600, [b'\x04', b'\xff', b'\xff', b'\x7f', b'\x17', b'\x15', b'\x12', b'\xff', b'\x03', b'\x1c', b'\x1a', b'\x19', b'\x11', b'\x13', b'\x16', b'\x0f', b'\x01', b'\x00', b'\x14', b'\xff']]
+            termios(c_iflag: 11010, c_oflag: 3, c_cflag: 19200, c_lflag: 1483, c_cc: (4, 255, 255, 127, 23, 21, 18, 255, 3, 28, 26, 25, 17, 19, 22, 15, 1, 0, 20, 255), c_ispeed: 9600, c_ospeed: 9600)
+            """
 
             for command in commands:
                 write_to_pty(master_fd, command)

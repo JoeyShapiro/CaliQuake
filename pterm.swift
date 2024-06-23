@@ -60,7 +60,7 @@ func runBash() {
 
     // Write commands to the pseudo-terminal
     let command1 = "echo 'Hello, World!'\n"
-    let command2 = "ls -l\n"
+    let command2 = "ls\n"
     let command3 = "exit\n"
     let command4 = "python3 -c 'import sys; print(sys.stdout.isatty())'\n"
     let command5 = "printf 'Colors: \\033[31mRed\\033[0m \\033[32mGreen\\033[0m \\033[34mBlue\\033[0m \\033[33mYellow\\033[0m \\033[35mMagenta\\033[0m \\033[36mCyan\\033[0m\n'"
