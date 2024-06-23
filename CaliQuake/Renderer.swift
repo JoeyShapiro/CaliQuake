@@ -157,7 +157,7 @@ class Renderer: NSObject {
         for ac in text {
             attributes[.foregroundColor] = ac.fg
             let pos = CGPoint(x: (CGFloat(ac.x) * font.pointSize) / ratio, y: CGFloat(size.height-font.pointSize)-(CGFloat(ac.y) * font.pointSize * huh))
-            let rect = CGRect(origin: pos, size: CGSize(width: font.pointSize / (5/3), height: font.pointSize * huh))
+            let rect = CGRect(origin: pos, size: CGSize(width: (font.pointSize * CGFloat(ac.width)) / (5/3), height: font.pointSize * huh))
             String(ac.char).draw(in: rect, withAttributes: attributes)
             
             #if DEBUG

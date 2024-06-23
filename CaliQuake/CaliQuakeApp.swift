@@ -145,7 +145,7 @@ struct CaliQuakeApp: App {
             
         }
         while n > 0 {
-            text += parse(data, y: (text.last?.y ?? 0), x: (text.last?.x ?? -1))
+            text += parse(data, prev: text.last)
             do {
                 (data, n) = try await pty!.read()
             } catch {
@@ -156,16 +156,17 @@ struct CaliQuakeApp: App {
     }
     
     // using all of prev char could be useful
-    func parse(_ stdout: Data, y: Int, x: Int) -> [AnsiChar] {
+    func parse(_ stdout: Data, prev: AnsiChar?) -> [AnsiChar] {
+        //y: (text.last?.y ?? 0), x: (text.last?.x ?? 0)
+        var curChar = prev ?? AnsiChar(char: "�", fg: .white, x: 0, y: 0, width: 0)
         var isEsc = false
         var isMeta = false
         var parsed: [AnsiChar] = []
         let esc = 0o33
         let bel = 0o7
-        var row = y
-        var col = x+1
+        var row = curChar.y
+        var col = curChar.x
         var sequence = Data()
-        var curChar = AnsiChar(char: "a", fg: .white, x: col, y: row)
         
         var i = 0
         while i < stdout.count {
@@ -200,12 +201,7 @@ struct CaliQuakeApp: App {
                     i += 3
                 }
                 
-                curChar.char = Character(UnicodeScalar(unicode)!)
-                curChar.x = col
-                curChar.y = row
-
-                parsed.append(curChar)
-                col += 1
+                col += curChar.width
                 
                 // do action after placing it
                 if stdout[i] == 0xd /* \r */ {
@@ -216,10 +212,21 @@ struct CaliQuakeApp: App {
                     if i+1 < stdout.count && stdout[i+1] == 0xa /* \n */ {
                         i += 1
                     }
+                    curChar.width = 0
                 } else if stdout[i] == 0xa /* \n */ {
                     col = 0
                     row += 1
+                    curChar.width = 0
+                } else {
+                    curChar.width = 1
                 }
+                
+                curChar.char = Character(UnicodeScalar(unicode)!)
+                curChar.x = col
+                curChar.y = row
+                
+                
+                parsed.append(curChar)
                 
                 // handle window size
                 if col > 80 {

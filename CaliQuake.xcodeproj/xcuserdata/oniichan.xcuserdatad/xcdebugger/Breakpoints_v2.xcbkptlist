@@ -14,9 +14,9 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "244"
-            endingLineNumber = "244"
-            landmarkName = "parse(_:y:x:)"
+            startingLineNumber = "251"
+            endingLineNumber = "251"
+            landmarkName = "parse(_:prev:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -30,9 +30,9 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "253"
-            endingLineNumber = "253"
-            landmarkName = "parse(_:y:x:)"
+            startingLineNumber = "260"
+            endingLineNumber = "260"
+            landmarkName = "parse(_:prev:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -46,9 +46,9 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "265"
-            endingLineNumber = "265"
-            landmarkName = "parse(_:y:x:)"
+            startingLineNumber = "272"
+            endingLineNumber = "272"
+            landmarkName = "parse(_:prev:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -174,9 +174,9 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "171"
-            endingLineNumber = "171"
-            landmarkName = "parse(_:y:x:)"
+            startingLineNumber = "172"
+            endingLineNumber = "172"
+            landmarkName = "parse(_:prev:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

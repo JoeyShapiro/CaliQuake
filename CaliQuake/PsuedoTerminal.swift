@@ -147,4 +147,5 @@ struct AnsiChar {
     var fg: NSColor // Color causes crash
     var x: Int
     var y: Int
+    var width: Int // need this, but want \n to be at end of line
 }
