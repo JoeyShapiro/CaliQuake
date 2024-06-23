@@ -9,8 +9,9 @@ import Foundation
 import Dispatch
 
 class PseudoTerminal {
-    private var shell = "/bin/bash".withCString(strdup)
+    private var shell = "/bin/zsh".withCString(strdup)
     private var fileActions: posix_spawn_file_actions_t? = nil
+    private var spawnAttr: posix_spawnattr_t? = nil
     private var master: Int32 = 0
     private var slave: Int32 = 0
     public var pid: pid_t
@@ -34,15 +35,18 @@ class PseudoTerminal {
         tcgetattr(self.master, &term)
 //        term.c_lflag &= ~UInt(ECHO | ECHOCTL)
         tcsetattr(self.master, TCSAFLUSH, &term)
-        print(term)
         
         posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDIN_FILENO)
         posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDOUT_FILENO)
         posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDERR_FILENO)
         posix_spawn_file_actions_addclose(&self.fileActions, self.master)
         
+        // Set up spawn attributes
+        posix_spawnattr_init(&self.spawnAttr)
+        posix_spawnattr_setflags(&self.spawnAttr, Int16(POSIX_SPAWN_SETSID))
+        
         self.pid = 0
-        let spawnResult = posix_spawn(&self.pid, shell, &fileActions, nil, [shell], environment.keys.map { $0.withCString(strdup) })
+        let spawnResult = posix_spawn(&self.pid, shell, &fileActions, &self.spawnAttr, [shell], environment.keys.map { $0.withCString(strdup) })
         
         if spawnResult != 0 {
             fatalError("Error launching shell: \(spawnResult)")
@@ -134,6 +138,9 @@ class PseudoTerminal {
         // Destroy the posix_spawn_file_actions_t structure
         posix_spawn_file_actions_destroy(&self.fileActions)
         self.fileActions?.deallocate()
+        
+        posix_spawnattr_destroy(&self.spawnAttr)
+        self.spawnAttr?.deallocate()
         
         #if DEBUG
             print("Closed")

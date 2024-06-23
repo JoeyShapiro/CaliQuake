@@ -78,8 +78,8 @@
             filePath = "CaliQuake/PsuedoTerminal.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "108"
-            endingLineNumber = "108"
+            startingLineNumber = "112"
+            endingLineNumber = "112"
             landmarkName = "read()"
             landmarkType = "7">
          </BreakpointContent>
@@ -129,22 +129,6 @@
             startingLineNumber = "68"
             endingLineNumber = "68"
             landmarkName = "draw(in:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "97647996-964F-4D7D-BFDF-5999A45346B0"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "CaliQuake/PsuedoTerminal.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "36"
-            endingLineNumber = "36"
-            landmarkName = "init(rows:cols:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
