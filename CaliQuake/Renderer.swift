@@ -19,8 +19,10 @@ class Renderer: NSObject {
     let huh: CGFloat = 1.1
     let font: NSFont
     private var debug: Bool
+    let width: CGFloat
+    let height: CGFloat
 
-    init(device: MTLDevice, font: NSFont, debug: Bool) {
+    init(device: MTLDevice, font: NSFont, debug: Bool, cols: Int, rows: Int) {
         self.device = device
         self.commandQueue = device.makeCommandQueue()
 
@@ -40,6 +42,9 @@ class Renderer: NSObject {
         
         self.font = font
         self.debug = debug
+        
+        self.width = font.pointSize * CGFloat(cols) / self.ratio
+        self.height = font.pointSize * CGFloat(rows) * self.huh
 
         super.init()
     }
@@ -62,7 +67,7 @@ class Renderer: NSObject {
 //            guard let font = NSFont(name: "SFMono-Regular", size: 12) else {
 //                fatalError("cannot find font")
 //            }
-            let imageData = convertCGImageToData(makeImage(text: self.text, font: self.font, size: CGSize(width: 512, height: 512))!)!
+            let imageData = convertCGImageToData(makeImage(text: self.text, font: self.font, size: CGSize(width: self.width, height: self.height))!)!
             
             let textureLoader = MTKTextureLoader(device: view.device!)
             

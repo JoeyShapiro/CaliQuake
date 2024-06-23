@@ -40,12 +40,14 @@ struct CaliQuakeApp: App {
     let font = NSFont.monospacedSystemFont(ofSize: 12, weight: NSFont.Weight(rawValue: 0.1))
     @State var size = 500.0
     @State var isDebug = true
+    let rows = 24
+    let cols = 80
     
     var body: some Scene {
         WindowGroup {
             ZStack {
-                MetalView(textBinding: $text, font: font, debug: $isDebug)
-                    .frame(width: size, height: size)
+                MetalView(textBinding: $text, font: font, debug: $isDebug, rows: self.rows, cols: self.cols)
+                    .frame(width: (font.pointSize * CGFloat(self.cols) / fontRatio ), height: (font.pointSize * fontHuh * CGFloat(self.rows)))
                     .focusable()
                     .focused($focused)
                     .focusEffectDisabled()
@@ -64,6 +66,8 @@ struct CaliQuakeApp: App {
                         
                         if keyPress.characters == "\r" || keyPress.characters == "\n" {
                             command += "\n"
+                            // best i can think of
+                            text += parse("\n".data(using: .utf8)!, prev: text.last)
                             //                        text += keyPress.characters
                         } else if keyPress.characters == "\u{7f}" { // backspace
                             //                        command.removeLast()
@@ -99,7 +103,7 @@ struct CaliQuakeApp: App {
                         }
                     }
                 // getting the location causes a re-init
-                PopView(fontHuh: fontHuh, fontRatio: fontRatio, text: $text, pointSize: font.pointSize, debug: $isDebug)
+                PopView(fontHuh: fontHuh, fontRatio: fontRatio, text: $text, pointSize: font.pointSize, debug: $isDebug, rows: self.rows, cols: self.cols)
                 //                .alert("Important message", isPresented: $show) {
                 //                    Button("OK") { }
                 //                }
@@ -116,7 +120,7 @@ struct CaliQuakeApp: App {
     
     func startTTY() {
         // TODO best i can think of
-        appDelegate.pty = PseudoTerminal(rows: 24, cols: 80)
+        appDelegate.pty = PseudoTerminal(rows: self.rows, cols: self.cols)
         pty = appDelegate.pty
         
         // kill the prev
@@ -235,7 +239,7 @@ struct CaliQuakeApp: App {
                 parsed.append(curChar)
                 
                 // handle window size
-                if col > 80 {
+                if col > self.cols {
                     col = 0
                     row += 1
                 }

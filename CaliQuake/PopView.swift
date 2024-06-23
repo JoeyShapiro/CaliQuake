@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct PopView: View {
-    let size = 500.0
     let fontRatio: CGFloat
     let fontHuh: CGFloat
     let pointSize: CGFloat
@@ -17,8 +16,12 @@ struct PopView: View {
     @State var popAC = AnsiChar(char: "�", fg: .clear, x: -1, y: -1, width: 1)
     @Binding var text: [AnsiChar]
     @Binding var debug: Bool
+    let rows: Int
+    let cols: Int
+    let width: CGFloat
+    let height: CGFloat
     
-    init(fontHuh: CGFloat, fontRatio: CGFloat, text: Binding<[AnsiChar]>, pointSize: CGFloat, debug: Binding<Bool>) {
+    init(fontHuh: CGFloat, fontRatio: CGFloat, text: Binding<[AnsiChar]>, pointSize: CGFloat, debug: Binding<Bool>, rows: Int, cols: Int) {
         self.popPos = CGPoint(x: -1.0, y: -1.0)
         self.visible = false
         self._text = text
@@ -27,6 +30,12 @@ struct PopView: View {
         self.fontRatio = fontRatio
         self.pointSize = pointSize
         self._debug = debug
+        
+        self.rows = rows
+        self.cols = cols
+        
+        self.width = (self.pointSize * CGFloat(self.cols) / self.fontRatio )
+        self.height = (self.pointSize * self.fontHuh * CGFloat(self.rows))
     }
     
     var body: some View {
@@ -56,7 +65,7 @@ struct PopView: View {
                         }
                 )
         }
-            .frame(width: size, height: size)
+        .frame(width: self.width, height: self.height)
             .popover(isPresented: $visible,  attachmentAnchor: .rect(.rect(CGRect(x: popPos.x, y: popPos.y, width: 0, height: 0)))) {
                 // TODO unknown value
                 let value = popAC.char.unicodeScalars.first?.value ?? UInt32(0.0)
