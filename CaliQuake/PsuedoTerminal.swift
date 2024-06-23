@@ -42,6 +42,7 @@ class PseudoTerminal {
         posix_spawn_file_actions_addclose(&self.fileActions, self.master)
         
         // Set up spawn attributes
+        // fixes all my problems, even the orphan using >100% cpu
         posix_spawnattr_init(&self.spawnAttr)
         posix_spawnattr_setflags(&self.spawnAttr, Int16(POSIX_SPAWN_SETSID))
         

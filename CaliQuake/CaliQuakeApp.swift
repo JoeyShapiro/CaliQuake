@@ -39,11 +39,12 @@ struct CaliQuakeApp: App {
     let fontHuh: CGFloat = 1.1
     let font = NSFont.monospacedSystemFont(ofSize: 12, weight: NSFont.Weight(rawValue: 0.1))
     @State var size = 500.0
+    @State var isDebug = true
     
     var body: some Scene {
         WindowGroup {
             ZStack {
-                MetalView(textBinding: $text, font: font)
+                MetalView(textBinding: $text, font: font, debug: $isDebug)
                     .frame(width: size, height: size)
                     .focusable()
                     .focused($focused)
@@ -56,6 +57,11 @@ struct CaliQuakeApp: App {
                         Phase: \(keyPress.phase)
                         Debug description: \(keyPress.debugDescription)
                     """)
+                        if keyPress.modifiers.rawValue == 16 && keyPress.characters == "i" {
+                            isDebug.toggle()
+                            return .handled
+                        }
+                        
                         if keyPress.characters == "\r" || keyPress.characters == "\n" {
                             command += "\n"
                             //                        text += keyPress.characters

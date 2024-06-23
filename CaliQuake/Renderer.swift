@@ -18,8 +18,9 @@ class Renderer: NSObject {
     let ratio: CGFloat = 5/3
     let huh: CGFloat = 1.1
     let font: NSFont
+    private var debug: Bool
 
-    init(device: MTLDevice, font: NSFont) {
+    init(device: MTLDevice, font: NSFont, debug: Bool) {
         self.device = device
         self.commandQueue = device.makeCommandQueue()
 
@@ -38,6 +39,7 @@ class Renderer: NSObject {
         self.text = []
         
         self.font = font
+        self.debug = debug
 
         super.init()
     }
@@ -46,8 +48,9 @@ class Renderer: NSObject {
         // Handle size change if necessary
     }
     
-    func update(text: [AnsiChar]) {
+    func update(text: [AnsiChar], debug: Bool) {
         self.text = text
+        self.debug = debug
         self.isDirty = true
     }
 
@@ -161,9 +164,11 @@ class Renderer: NSObject {
             String(ac.char).draw(in: rect, withAttributes: attributes)
             
             #if DEBUG
+            if self.debug {
                 context.setStrokeColor(NSColor.red.cgColor)  // Set border color
                 context.setLineWidth(0.2)  // Set border width
                 context.stroke(rect)
+            }
             #endif
         }
         
