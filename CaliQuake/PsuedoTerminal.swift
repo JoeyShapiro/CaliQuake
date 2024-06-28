@@ -9,7 +9,7 @@ import Foundation
 import Dispatch
 
 class PseudoTerminal {
-    private var shell = "/bin/zsh".withCString(strdup)
+    private var shell = "/bin/zsh".withCString(strdup) // /opt/homebrew/bin/nu
     private var fileActions: posix_spawn_file_actions_t? = nil
     private var spawnAttr: posix_spawnattr_t? = nil
     private var master: Int32 = 0
@@ -17,43 +17,113 @@ class PseudoTerminal {
     public var pid: pid_t
     
     init(rows: Int, cols: Int) {
-        var environment: [String: String] = ProcessInfo.processInfo.environment
-        environment["PATH"] = getenv("PATH").flatMap { String(cString: $0) } ?? ""
-        
-        posix_spawn_file_actions_init(&self.fileActions)
-        
         var winp: winsize = winsize()
         // TODO bad values
         winp.ws_row = UInt16(rows)
         winp.ws_col = UInt16(cols)
-        let result = openpty(&master, &slave, nil, nil, &winp)
-        if result != 0 {
-            fatalError("Error creating pseudo-terminal: \(result)")
-        }
         
         var term: termios = termios()
         tcgetattr(self.master, &term)
-//        term.c_lflag &= ~UInt(ECHO | ECHOCTL)
+        print(term)
+        //        term.c_lflag &= ~UInt(ECHO | ECHOCTL)
+        //        term.c_lflag &= ~UInt(ICANON | ECHO)
         tcsetattr(self.master, TCSAFLUSH, &term)
         
-        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDIN_FILENO)
-        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDOUT_FILENO)
-        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDERR_FILENO)
+        var name = [CChar](repeating: 0, count: 1024)
+        self.pid = forkpty(&self.master, &name, &term, &winp)
+        if self.pid == 0 {
+            // child
+            self.child()
+        }
+        if self.pid == -1 {
+            fatalError("Error creating pseudo-terminal: \(self.pid) \(errno)")
+        }
+        print("forked \(String(cString: name))")
+        
+//        Darwin.close(self.slave)
+    }
+    
+    func child() -> pid_t {
+        print("started child")
+        var environment: [String: String] = ProcessInfo.processInfo.environment
+        environment["PATH"] = getenv("PATH").flatMap { String(cString: $0) } ?? ""
+        environment["TERM"] = "xterm" // TODO does not get set
+        environment["OS_ACTIVITY_MODE"] = "disable"
+        
+        posix_spawn_file_actions_init(&self.fileActions)
+        
+        //        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDIN_FILENO)
+        //        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDOUT_FILENO)
+        //        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDERR_FILENO)
+        //        posix_spawn_file_actions_addclose(&self.fileActions, self.master)
+        
+        // MARK: actions
+        let fds: [Int32] = [ STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO ]
+        for i in 0..<3 {
+            if fds[i] != i {
+                posix_spawn_file_actions_adddup2(&self.fileActions, fds[i], Int32(i))
+            } else {
+                posix_spawn_file_actions_addinherit_np(&self.fileActions, Int32(i))
+            }
+        }
+        print("actions done")
+        
         posix_spawn_file_actions_addclose(&self.fileActions, self.master)
         
+        // MARK: attributes
         // Set up spawn attributes
         // fixes all my problems, even the orphan using >100% cpu
         posix_spawnattr_init(&self.spawnAttr)
-        posix_spawnattr_setflags(&self.spawnAttr, Int16(POSIX_SPAWN_SETSID))
+        var flags: Int16 = 0;
+        // Use spawn-sigdefault in attrs rather than inheriting parent's signal
+        // actions (vis-a-vis caught vs default action)
+        flags |= Int16(POSIX_SPAWN_SETSIGDEF)
+        // Use spawn-sigmask of attrs for the initial signal mask.
+        flags |= Int16(POSIX_SPAWN_SETSIGMASK)
+        // Close all file descriptors except those created by file actions.
+        flags |= Int16(POSIX_SPAWN_CLOEXEC_DEFAULT)
+        //        flags |= Int16(POSIX_SPAWN_SETSID)
+        flags |= Int16(POSIX_SPAWN_SETEXEC);
+        posix_spawnattr_setflags(&self.spawnAttr, flags)
+        print("attr done")
         
-        self.pid = 0
-        let spawnResult = posix_spawn(&self.pid, shell, &fileActions, &self.spawnAttr, [shell], environment.keys.map { $0.withCString(strdup) })
+        // Do not start the new process with signal handlers.
+        var default_signals: sigset_t = sigset_t()
+        sigfillset(&default_signals)
+        for i in 0..<NSIG {
+            sigdelset(&default_signals, i)
+        }
+        posix_spawnattr_setsigdefault(&self.spawnAttr, &default_signals)
+        print("signals done")
         
+        // Unblock all signals.
+        var signals: sigset_t = sigset_t();
+        sigemptyset(&signals)
+        posix_spawnattr_setsigmask(&self.spawnAttr, &signals)
+        print("unblock done")
+        
+        // Prepare the arguments array
+//        let arguments = ["--login"]
+//        let arguments = [ "-c", "ls", "-lah" ]
+        let arguments = [ "-c", "ps", "-eaf", "|", "grep", "zsh" ]
+        let args = [shell] + arguments.map { strdup($0) }
+        defer { for arg in args { free(arg) } }
+        
+        // Create a null-terminated array of C string pointers
+        var argsPtrs = args.map { UnsafeMutablePointer<CChar>($0) }
+        argsPtrs.append(nil)
+        print("args done")
+        
+        var cpid: pid_t = 0
+        let spawnResult = posix_spawn(&cpid, shell, &fileActions, &self.spawnAttr, argsPtrs, environment.keys.map { $0.withCString(strdup) })
+        
+        print("spawn: \(spawnResult)")
         if spawnResult != 0 {
             fatalError("Error launching shell: \(spawnResult)")
         }
+        self.write(command: "echo \(spawnResult)")
         
-        Darwin.close(self.slave)
+        return cpid
     }
     
     // should go here, just in case
@@ -89,7 +159,7 @@ class PseudoTerminal {
                 if bytesRead > 0 {
                     data.append(buffer, count: bytesRead)
                     #if DEBUG
-                        if let output = String(data: data, encoding: .utf8) {
+                    if let output = String(data: data, encoding: .utf8) {
                             print("\"", terminator: "")
                             for c in output {
                                 let val = c.unicodeScalars.first?.value ?? 0
