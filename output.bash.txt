@@ -86,3 +86,25 @@ output.zsh.txt			unicode.py
 True
 ]697;OSCUnlock=fb90cdf3e3ce4b2cbf4d824f1917f858]697;Dir=/Users/oniichan/Documents/Code/CaliQuake]697;Shell=bash]697;ShellPath=/bin/bash]697;PID=55515]697;ExitCode=0]697;TTY=/dev/ttys005]697;Log=]697;User=oniichan]697;OSCLock=fb90cdf3e3ce4b2cbf4d824f1917f858]697;PreExec]697;StartPromptbash-3.2$ ]697;EndPrompt]697;NewCmd=fb90cdf3e3ce4b2cbf4d824f1917f858exit
 exit
+echo Hello from PTY
+Child PID is 18365
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+]697;OSCUnlock=8e4717aaa6d44f7cbce67697eb472b7f]697;Dir=/Users/oniichan/Documents/Code/CaliQuake]697;Shell=bash]697;ShellPath=/bin/bash]697;PID=18365]697;ExitCode=0]697;TTY=/dev/ttys008]697;Log=]697;User=oniichan]697;OSCLock=8e4717aaa6d44f7cbce67697eb472b7f]697;PreExec]697;OSCLock=8e4717aaa6d44f7cbce67697eb472b7f]697;PreExec[?1034h]697;StartPromptbash-3.2$ ]697;EndPrompt]697;NewCmd=8e4717aaa6d44f7cbce67697eb472b7fecho Hello from PTY
+Hello from PTY
+]697;OSCUnlock=8e4717aaa6d44f7cbce67697eb472b7f]697;Dir=/Users/oniichan/Documents/Code/CaliQuake]697;Shell=bash]697;ShellPath=/bin/bash]697;PID=18365]697;ExitCode=0]697;TTY=/dev/ttys008]697;Log=]697;User=oniichan]697;StartPromptbash-3.2$ ]697;EndPrompt]697;NewCmd=8e4717aaa6d44f7cbce67697eb472b7fls
+CaliQuake			perf-cpu-gpuRendering.trace
+CaliQuake.xcodeproj		progress
+CaliQuakeTests			pterm.py
+CaliQuakeUITests		pterm.swift
+out.txt				shell.py
+output.bash.txt			signal.swift
+output.zsh.txt			unicode.py
+]697;OSCUnlock=8e4717aaa6d44f7cbce67697eb472b7f]697;Dir=/Users/oniichan/Documents/Code/CaliQuake]697;Shell=bash]697;ShellPath=/bin/bash]697;PID=18365]697;ExitCode=0]697;TTY=/dev/ttys008]697;Log=]697;User=oniichan]697;OSCLock=8e4717aaa6d44f7cbce67697eb472b7f]697;PreExec]697;StartPromptbash-3.2$ ]697;EndPrompt]697;NewCmd=8e4717aaa6d44f7cbce67697eb472b7fpwd
+/Users/oniichan/Documents/Code/CaliQuake
+]697;OSCUnlock=8e4717aaa6d44f7cbce67697eb472b7f]697;Dir=/Users/oniichan/Documents/Code/CaliQuake]697;Shell=bash]697;ShellPath=/bin/bash]697;PID=18365]697;ExitCode=0]697;TTY=/dev/ttys008]697;Log=]697;User=oniichan]697;OSCLock=8e4717aaa6d44f7cbce67697eb472b7f]697;PreExec]697;StartPromptbash-3.2$ ]697;EndPrompt]697;NewCmd=8e4717aaa6d44f7cbce67697eb472b7fpython -c 'import sys; print(sys.stdout.isatty())'
+True
+]697;OSCUnlock=8e4717aaa6d44f7cbce67697eb472b7f]697;Dir=/Users/oniichan/Documents/Code/CaliQuake]697;Shell=bash]697;ShellPath=/bin/bash]697;PID=18365]697;ExitCode=0]697;TTY=/dev/ttys008]697;Log=]697;User=oniichan]697;OSCLock=8e4717aaa6d44f7cbce67697eb472b7f]697;PreExec]697;StartPromptbash-3.2$ ]697;EndPrompt]697;NewCmd=8e4717aaa6d44f7cbce67697eb472b7fexit
+exit

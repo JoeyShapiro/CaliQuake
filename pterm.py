@@ -4,7 +4,7 @@ import signal
 import time
 import select
 
-SHELL = 'bash'
+SHELL = 'zsh'
 
 def read_from_pty(master_fd):
     """Read output from the master side of the PTY and print it."""
@@ -37,7 +37,7 @@ def main():
         # Child process
         # Replace the child process with the bash shell
         print("Child PID is", os.getpid())
-        os.execlp(SHELL, SHELL)
+        os.execvp(SHELL, [SHELL])
     else:
         print("Parent PID is", os.getpid())
         # Parent process
@@ -50,7 +50,10 @@ def main():
                 "echo Hello from PTY\n",
                 "ls\n",
                 "pwd\n",
-                "python -c 'import sys; print(sys.stdout.isatty())'\n"
+                "python -c 'import sys; print(sys.stdout.isatty())'\n",
+                "echo $TERM\n",
+                "ps -efl | grep zsh\n",
+                "echo dummpy\n",
                 "exit\n",
             ]
 

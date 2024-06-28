@@ -1,0 +1,55 @@
+echo Hello from PTY
+Child PID is 9516
+]2;~/Documents/Code/CaliQuake]7;file://Joeys-MacBook-Max.local/Users/oniichan/Documents/Code/CaliQuake\]633;P;Cwd=/Users/oniichan/Documents/Code/CaliQuake\[32m     __  ,[0m
+[32m .--()°'.' [0mWelcome to [32mNushell[0m,
+[32m'|, . ,'   [0mbased on the [32mnu[0m language,
+[32m !_-(_\    [0mwhere all data is structured!
+
+Please join our [35mDiscord[0m community at [35mhttps://discord.gg/NtAbbGn[0m
+Our [1;32mGitHub[0m repository is at [1;32mhttps://github.com/nushell/nushell[0m
+Our [32mDocumentation[0m is located at [32mhttps://nushell.sh[0m
+[36mTweet[0m us at [1;36m@nu_shell[0m
+Learn how to remove this at: [32mhttps://nushell.sh/book/configuration.html#remove-welcome-message[0m
+
+It's been this long since [32mNushell[0m's first commit:
+5yrs 1month 14days 7hrs 53mins 49secs 476ms 507µs 
+
+Startup Time: 58ms 962µs 292ns
+
+[?2004h[6n[?2004l]633;D;0\[?2004h[6n[?2004l]633;D;0\[?2004h[6necho Hello from PTY
+Child PID is 11065
+]2;~/Documents/Code/CaliQuake]7;file://Joeys-MacBook-Max.local/Users/oniichan/Documents/Code/CaliQuake\]633;P;Cwd=/Users/oniichan/Documents/Code/CaliQuake\[32m     __  ,[0m
+[32m .--()°'.' [0mWelcome to [32mNushell[0m,
+[32m'|, . ,'   [0mbased on the [32mnu[0m language,
+[32m !_-(_\    [0mwhere all data is structured!
+
+Please join our [35mDiscord[0m community at [35mhttps://discord.gg/NtAbbGn[0m
+Our [1;32mGitHub[0m repository is at [1;32mhttps://github.com/nushell/nushell[0m
+Our [32mDocumentation[0m is located at [32mhttps://nushell.sh[0m
+[36mTweet[0m us at [1;36m@nu_shell[0m
+Learn how to remove this at: [32mhttps://nushell.sh/book/configuration.html#remove-welcome-message[0m
+
+It's been this long since [32mNushell[0m's first commit:
+5yrs 1month 14days 7hrs 57mins 51secs 636ms 514µs 
+
+Startup Time: 15ms 887µs 708ns
+
+[?2004h[6n[?2004l]633;D;0\[?2004h[6necho Hello from PTY
+Child PID is 53215
+]2;~/Documents/Code/CaliQuake]7;file://Joeys-MacBook-Max.local/Users/oniichan/Documents/Code/CaliQuake\]633;P;Cwd=/Users/oniichan/Documents/Code/CaliQuake\[32m     __  ,[0m
+[32m .--()°'.' [0mWelcome to [32mNushell[0m,
+[32m'|, . ,'   [0mbased on the [32mnu[0m language,
+[32m !_-(_\    [0mwhere all data is structured!
+
+Please join our [35mDiscord[0m community at [35mhttps://discord.gg/NtAbbGn[0m
+Our [1;32mGitHub[0m repository is at [1;32mhttps://github.com/nushell/nushell[0m
+Our [32mDocumentation[0m is located at [32mhttps://nushell.sh[0m
+[36mTweet[0m us at [1;36m@nu_shell[0m
+Learn how to remove this at: [32mhttps://nushell.sh/book/configuration.html#remove-welcome-message[0m
+
+It's been this long since [32mNushell[0m's first commit:
+5yrs 1month 14days 22hrs 26mins 20secs 36ms 597µs 
+
+Startup Time: 43ms 180µs 875ns
+
+[?2004h[6n[?2004l]633;D;0\[?2004h[6n
