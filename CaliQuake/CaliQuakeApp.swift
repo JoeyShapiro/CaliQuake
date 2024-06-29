@@ -186,6 +186,10 @@ struct CaliQuakeApp: App {
                 // esc [ 6 9 7 ;
                 //   0 1 2 3 4 5
                 i += 1 // "["
+                // TODO bad
+                if i+3 > stdout.count {
+                    break
+                }
                 isMeta = stdout[i+1] == 54 /* 6 */ && stdout[i+2] == 57 /* 9 */ && stdout[i+3] == 55 /* 7 */
                 if isMeta {
                     i += 3
@@ -283,7 +287,7 @@ struct CaliQuakeApp: App {
                             case 39:
                                 curChar.fg = .white
                             default: // 0
-                                curChar.fg = .white
+                                curChar.fg = .debugMagenta
                             }
                         }
                     }
@@ -297,4 +301,8 @@ struct CaliQuakeApp: App {
         
         return parsed
     }
+}
+
+extension NSColor {
+    static let debugMagenta = NSColor(red: 1.0, green: 0.0, blue: 1.0, alpha: 1.0)
 }

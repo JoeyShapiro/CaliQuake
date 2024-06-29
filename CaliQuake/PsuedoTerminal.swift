@@ -48,7 +48,7 @@ class PseudoTerminal {
         print("started child")
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = getenv("PATH").flatMap { String(cString: $0) } ?? ""
-        environment["TERM"] = "xterm" // TODO does not get set
+        environment["TERM"] = "xterm-256color" // TODO does not get set
         environment["OS_ACTIVITY_MODE"] = "disable"
         environment["LANG"] = "en_US.UTF-8"
         
