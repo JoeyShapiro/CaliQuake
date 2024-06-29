@@ -59,17 +59,19 @@ func runBash() {
     }
 
     // Write commands to the pseudo-terminal
-    let command1 = "echo 'Hello, World!'\n"
-    let command2 = "ls\n"
+    let command1 = "echo 'Hello, World!'\n" // TERM=xterm-256color
+    let command2 = "echo term: $TERM\n" // ls
     let command3 = "exit\n"
     let command4 = "python3 -c 'import sys; print(sys.stdout.isatty())'\n"
     let command5 = "printf 'Colors: \\033[31mRed\\033[0m \\033[32mGreen\\033[0m \\033[34mBlue\\033[0m \\033[33mYellow\\033[0m \\033[35mMagenta\\033[0m \\033[36mCyan\\033[0m\n'"
-    
+    let command6 = "echo 'term:'\n"
+
     let commandData1 = command1.data(using: .utf8)!
     let commandData2 = command2.data(using: .utf8)!
     let commandData3 = command3.data(using: .utf8)!
     let commandData4 = command4.data(using: .utf8)!
     let commandData5 = command5.data(using: .utf8)!
+    let commandData6 = command6.data(using: .utf8)!
     
     commandData1.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
         let n = write(master, ptr.baseAddress!, ptr.count)
@@ -87,6 +89,11 @@ func runBash() {
     }
 
     commandData5.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
+        let n = write(master, ptr.baseAddress!, ptr.count)
+        print("wrote \(n) bytes")
+    }
+
+    commandData6.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
         let n = write(master, ptr.baseAddress!, ptr.count)
         print("wrote \(n) bytes")
     }

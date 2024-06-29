@@ -9,7 +9,7 @@ import Foundation
 import Dispatch
 
 class PseudoTerminal {
-    private var shell = "/bin/zsh".withCString(strdup) // /opt/homebrew/bin/nu
+    private var shell = "/usr/bin/login".withCString(strdup) // /opt/homebrew/bin/nu
     private var fileActions: posix_spawn_file_actions_t? = nil
     private var spawnAttr: posix_spawnattr_t? = nil
     private var master: Int32 = 0
@@ -23,49 +23,50 @@ class PseudoTerminal {
         winp.ws_col = UInt16(cols)
         
         var term: termios = termios()
+        term.c_iflag = tcflag_t(ICRNL | IXON | IXANY | IMAXBEL | BRKINT | IUTF8)
+        term.c_oflag = tcflag_t(OPOST | ONLCR)
+        term.c_cflag = tcflag_t(CREAD | CS8 | HUPCL)
+        term.c_lflag = tcflag_t(ICANON | ISIG | IEXTEN | ECHO | ECHOE | ECHOK | ECHOKE | ECHOCTL)
         tcgetattr(self.master, &term)
-        print(term)
-        //        term.c_lflag &= ~UInt(ECHO | ECHOCTL)
-        //        term.c_lflag &= ~UInt(ICANON | ECHO)
         tcsetattr(self.master, TCSAFLUSH, &term)
         
         var name = [CChar](repeating: 0, count: 1024)
-        self.pid = forkpty(&self.master, &name, &term, &winp)
+        self.pid = openpty(&self.master, &self.slave, &name, &term, &winp)
+//        self.pid = forkpty(&self.master, &name, &term, &winp)
         if self.pid == 0 {
             // child
             self.child()
+            print("child done")
         }
         if self.pid == -1 {
             fatalError("Error creating pseudo-terminal: \(self.pid) \(errno)")
         }
         print("forked \(String(cString: name))")
-        
-//        Darwin.close(self.slave)
     }
     
     func child() -> pid_t {
         print("started child")
-        var environment: [String: String] = ProcessInfo.processInfo.environment
+        var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = getenv("PATH").flatMap { String(cString: $0) } ?? ""
         environment["TERM"] = "xterm" // TODO does not get set
         environment["OS_ACTIVITY_MODE"] = "disable"
+        environment["LANG"] = "en_US.UTF-8"
         
         posix_spawn_file_actions_init(&self.fileActions)
         
-        //        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDIN_FILENO)
-        //        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDOUT_FILENO)
-        //        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDERR_FILENO)
-        //        posix_spawn_file_actions_addclose(&self.fileActions, self.master)
+        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDIN_FILENO)
+        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDOUT_FILENO)
+        posix_spawn_file_actions_adddup2(&self.fileActions, self.slave, STDERR_FILENO)
         
         // MARK: actions
-        let fds: [Int32] = [ STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO ]
-        for i in 0..<3 {
-            if fds[i] != i {
-                posix_spawn_file_actions_adddup2(&self.fileActions, fds[i], Int32(i))
-            } else {
-                posix_spawn_file_actions_addinherit_np(&self.fileActions, Int32(i))
-            }
-        }
+//        let fds: [Int32] = [ STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO ]
+//        for i in 0..<3 {
+//            if fds[i] != i {
+//                posix_spawn_file_actions_adddup2(&self.fileActions, fds[i], Int32(i))
+//            } else {
+//                posix_spawn_file_actions_addinherit_np(&self.fileActions, Int32(i))
+//            }
+//        }
         print("actions done")
         
         posix_spawn_file_actions_addclose(&self.fileActions, self.master)
@@ -74,18 +75,23 @@ class PseudoTerminal {
         // Set up spawn attributes
         // fixes all my problems, even the orphan using >100% cpu
         posix_spawnattr_init(&self.spawnAttr)
+        
         var flags: Int16 = 0;
         // Use spawn-sigdefault in attrs rather than inheriting parent's signal
         // actions (vis-a-vis caught vs default action)
-        flags |= Int16(POSIX_SPAWN_SETSIGDEF)
-        // Use spawn-sigmask of attrs for the initial signal mask.
-        flags |= Int16(POSIX_SPAWN_SETSIGMASK)
-        // Close all file descriptors except those created by file actions.
-        flags |= Int16(POSIX_SPAWN_CLOEXEC_DEFAULT)
-        //        flags |= Int16(POSIX_SPAWN_SETSID)
-        flags |= Int16(POSIX_SPAWN_SETEXEC);
-        posix_spawnattr_setflags(&self.spawnAttr, flags)
-        print("attr done")
+//        flags |= Int16(POSIX_SPAWN_SETSIGDEF)
+//        // Use spawn-sigmask of attrs for the initial signal mask.
+//        flags |= Int16(POSIX_SPAWN_SETSIGMASK)
+//        // Close all file descriptors except those created by file actions.
+//        flags |= Int16(POSIX_SPAWN_CLOEXEC_DEFAULT)
+//        flags |= Int16(POSIX_SPAWN_SETEXEC)
+        flags |= Int16(POSIX_SPAWN_SETSID)
+        let rc = posix_spawnattr_setflags(&self.spawnAttr, flags)
+        if rc != 0 {
+            print("attr failed")
+        } else {
+            print("attr done")
+        }
         
         // Do not start the new process with signal handlers.
         var default_signals: sigset_t = sigset_t()
@@ -103,11 +109,16 @@ class PseudoTerminal {
         print("unblock done")
         
         // Prepare the arguments array
-//        let arguments = ["--login"]
-//        let arguments = [ "-c", "ls", "-lah" ]
-        let arguments = [ "-c", "ps", "-eaf", "|", "grep", "zsh" ]
+//        let arguments: [String] = []
+        let arguments = [ "-fp", "oniichan", "/bin/zsh", "-fc", "exec -a -zsh /bin/zsh" ]
         let args = [shell] + arguments.map { strdup($0) }
         defer { for arg in args { free(arg) } }
+        let env = environment.map({ "\($0)=\($1)" }) 
+        // this was wrong. need this whole proper nightmare
+        //environment.keys.map { $0.withCString(strdup) }
+        let env2 = env.map { strdup($0) }
+        var ptrEnv = env2.map { UnsafeMutablePointer<CChar>($0) }
+        ptrEnv.append(nil)
         
         // Create a null-terminated array of C string pointers
         var argsPtrs = args.map { UnsafeMutablePointer<CChar>($0) }
@@ -115,13 +126,12 @@ class PseudoTerminal {
         print("args done")
         
         var cpid: pid_t = 0
-        let spawnResult = posix_spawn(&cpid, shell, &fileActions, &self.spawnAttr, argsPtrs, environment.keys.map { $0.withCString(strdup) })
+        let spawnResult = posix_spawn(&self.pid, shell, &fileActions, &self.spawnAttr, argsPtrs, ptrEnv)
         
         print("spawn: \(spawnResult)")
         if spawnResult != 0 {
-            fatalError("Error launching shell: \(spawnResult)")
+            fatalError("Error launching shell: \(spawnResult): \"\(String(cString: strerror(errno)))\"")
         }
-        self.write(command: "echo \(spawnResult)")
         
         return cpid
     }
