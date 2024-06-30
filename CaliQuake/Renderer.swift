@@ -150,7 +150,8 @@ class Renderer: NSObject {
         
         // Draw the text
         let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .left
+        paragraphStyle.alignment = .center
+        paragraphStyle.lineHeightMultiple = 0.9
         var attributes: [NSAttributedString.Key: Any] = [
             .font: font,
             .paragraphStyle: paragraphStyle,
