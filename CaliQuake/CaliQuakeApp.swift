@@ -156,6 +156,7 @@ struct CaliQuakeApp: App {
         }
         while n > 0 {
             text += parse(data, prev: text.last)
+            text = format(text)
             do {
                 (data, n) = try await pty!.read()
             } catch {
@@ -163,6 +164,19 @@ struct CaliQuakeApp: App {
             }
             print("read \(n)")
         }
+    }
+    
+    func format(_ text: [AnsiChar]) -> [AnsiChar] {
+        var formatted: [AnsiChar] = []
+        for ac in text {
+            if ac.char.asciiValue == 0x8 /* BS */ {
+                let _ = formatted.popLast()
+            } else {
+                formatted.append(ac)
+            }
+        }
+        
+        return formatted
     }
     
     // using all of prev char could be useful
@@ -231,6 +245,8 @@ struct CaliQuakeApp: App {
                     col = 0
                     row += 1
                     curChar.width = 0
+                } else if stdout[i] == 0x8 /* BS */ {
+                    curChar.width = -curChar.width
                 } else {
                     curChar.width = 1
                 }
@@ -238,7 +254,6 @@ struct CaliQuakeApp: App {
                 curChar.char = Character(UnicodeScalar(unicode)!)
                 curChar.x = col
                 curChar.y = row
-                
                 
                 parsed.append(curChar)
                 
