@@ -21,6 +21,7 @@ class Renderer: NSObject {
     private var debug: Bool
     let width: CGFloat
     let height: CGFloat
+    let mps: Bool
 
     init(device: MTLDevice, font: NSFont, debug: Bool, cols: Int, rows: Int) {
         self.device = device
@@ -43,8 +44,10 @@ class Renderer: NSObject {
         self.font = font
         self.debug = debug
         
-        self.width = font.pointSize * CGFloat(cols) / self.ratio
-        self.height = font.pointSize * CGFloat(rows) * self.huh
+        // all of these numbers must match
+        self.width = 7 * CGFloat(cols) /// self.ratio
+        self.height = 14 * CGFloat(rows)// * self.huh
+        self.mps = false
 
         super.init()
     }
@@ -71,7 +74,11 @@ class Renderer: NSObject {
             
             let textureLoader = MTKTextureLoader(device: view.device!)
             
-            self.texture = try? textureLoader.newTexture(data: imageData, options: nil)
+            let textureOptions: [MTKTextureLoader.Option : Any] = [
+                .SRGB : false,
+                .generateMipmaps : true
+            ]
+            self.texture = try? textureLoader.newTexture(data: imageData, options: textureOptions)
             
             isDirty = false
         }
@@ -87,6 +94,8 @@ class Renderer: NSObject {
         }
         
         encoder.setRenderPipelineState(pipelineState!)
+        var resolution = vector_float2(Float(view.drawableSize.width), Float(view.drawableSize.height))
+        encoder.setFragmentBytes(&resolution, length: MemoryLayout<vector_float2>.size, index: 0)
         encoder.setFragmentTexture(texture, index: 0)
         
         let vertices: [Float] = [
@@ -145,17 +154,23 @@ class Renderer: NSObject {
         guard let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 4 * width, space: colorSpace, bitmapInfo: bitmapInfo) else { return nil }
         
         context.scaleBy(x: scale, y: scale)
+//        context.setShouldAntialias(true)
+//        context.setAllowsAntialiasing(true)
+//        context.setShouldSmoothFonts(true)
+//        context.setAllowsFontSmoothing(true)
+        
         NSGraphicsContext.saveGraphicsState()
         NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
         
         // Draw the text
         let paragraphStyle = NSMutableParagraphStyle()
+        let style: FontStyle = .regular
         paragraphStyle.alignment = .center
         paragraphStyle.lineHeightMultiple = 0.9
         var attributes: [NSAttributedString.Key: Any] = [
-            .font: font,
+            .font: style.font(size: self.font.pointSize),
             .paragraphStyle: paragraphStyle,
-            .foregroundColor: NSColor.white // if the data is not the right type, it will crash
+            .foregroundColor: NSColor.white, // if the data is not the right type, it will crash
         ]
 //        for y in (0...64) {
 //            let pos = CGPoint(x: (CGFloat(0) * font.pointSize / 1.5), y: CGFloat(CGFloat(y) * font.pointSize / 1.5))
@@ -163,10 +178,15 @@ class Renderer: NSObject {
 //            String(y).draw(in: rect, withAttributes: attributes)
 //        }
         
+        // TODO get dimensions of app
+        // dimensions must be getting added somewhere
+        
         for ac in text {
             attributes[.foregroundColor] = ac.fg
-            let pos = CGPoint(x: (CGFloat(ac.x) * font.pointSize) / ratio, y: CGFloat(size.height-font.pointSize)-(CGFloat(ac.y) * font.pointSize * huh))
-            let rect = CGRect(origin: pos, size: CGSize(width: (font.pointSize * CGFloat(ac.width)) / (5/3), height: font.pointSize * huh))
+            attributes[.font] = ac.font.font(size: self.font.pointSize)
+            
+            let pos = CGPoint(x: (CGFloat(ac.x) * 7), y: CGFloat(size.height-font.pointSize)-(CGFloat(ac.y) * 14))
+            let rect = CGRect(origin: pos, size: CGSize(width: (7 * CGFloat(ac.width)), height: 14))
             String(ac.char).draw(in: rect, withAttributes: attributes)
             
             #if DEBUG
@@ -182,6 +202,25 @@ class Renderer: NSObject {
         
         // Create a texture from the bitmap context
         guard let image = context.makeImage() else { return nil }
+        
+        
+        let imageData = convertCGImageToData(image)!
+        
+        let textureLoader = MTKTextureLoader(device: self.device!)
+        
+        let textureOptions: [MTKTextureLoader.Option : Any] = [
+            .SRGB : false,
+            .generateMipmaps : true
+        ]
+        self.texture = try? textureLoader.newTexture(data: imageData, options: textureOptions)
+        let cicontext = CIContext()
+        let url = URL(fileURLWithPath: "/Users/oniichan/Downloads/texture2.png")
+        let ciimage = CIImage(cgImage: self.texture!.toCGImage()!)
+        do {
+            try cicontext.writePNGRepresentation(of: ciimage, to: url, format: .RGBA8, colorSpace: ciimage.colorSpace!)
+        } catch {
+            
+        }
         
         return image
     }
@@ -251,4 +290,32 @@ class Renderer: NSObject {
         return texture
     }
 
+}
+
+extension MTLTexture {
+    func toCGImage() -> CGImage? {
+        let width = self.width
+        let height = self.height
+        let bytesPerRow = width * 4
+        var bytes = [UInt8](repeating: 0, count: width * height * 4)
+        
+        self.getBytes(&bytes, bytesPerRow: bytesPerRow, from: MTLRegionMake2D(0, 0, width, height), mipmapLevel: 0)
+        
+        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+        guard let provider = CGDataProvider(data: Data(bytes: bytes, count: bytes.count) as CFData) else {
+            return nil
+        }
+        
+        return CGImage(width: width,
+                       height: height,
+                       bitsPerComponent: 8,
+                       bitsPerPixel: 32,
+                       bytesPerRow: bytesPerRow,
+                       space: CGColorSpaceCreateDeviceRGB(),
+                       bitmapInfo: bitmapInfo,
+                       provider: provider,
+                       decode: nil,
+                       shouldInterpolate: true,
+                       intent: .defaultIntent)
+    }
 }

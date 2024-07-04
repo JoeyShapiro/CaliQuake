@@ -139,3 +139,14 @@ func runBash() {
 print("starting...")
 runBash()
 print("done")
+
+// save CGImage as a png
+// let url = URL(fileURLWithPath: "/Users/oniichan/Downloads/test.png")
+// let cicontext = CIContext()
+// let ciimage = CIImage(cgImage: cgImage)
+// do {
+//     try cicontext.writePNGRepresentation(of: ciimage, to: url, format: .RGBA8, colorSpace: ciimage.colorSpace!)
+// } catch {
+    
+    
+// }

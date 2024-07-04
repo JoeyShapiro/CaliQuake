@@ -14,8 +14,8 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "280"
-            endingLineNumber = "280"
+            startingLineNumber = "296"
+            endingLineNumber = "296"
             landmarkName = "parse(_:prev:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -30,8 +30,8 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "289"
-            endingLineNumber = "289"
+            startingLineNumber = "310"
+            endingLineNumber = "310"
             landmarkName = "parse(_:prev:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -46,8 +46,8 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "301"
-            endingLineNumber = "301"
+            startingLineNumber = "322"
+            endingLineNumber = "322"
             landmarkName = "parse(_:prev:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -62,8 +62,8 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "130"
-            endingLineNumber = "130"
+            startingLineNumber = "131"
+            endingLineNumber = "131"
             landmarkName = "startTTY()"
             landmarkType = "7">
          </BreakpointContent>
@@ -78,8 +78,8 @@
             filePath = "CaliQuake/PsuedoTerminal.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "193"
-            endingLineNumber = "193"
+            startingLineNumber = "195"
+            endingLineNumber = "195"
             landmarkName = "read()"
             landmarkType = "7">
          </BreakpointContent>
@@ -94,8 +94,8 @@
             filePath = "CaliQuake/Renderer.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
+            startingLineNumber = "185"
+            endingLineNumber = "185"
             landmarkName = "makeImage(text:font:size:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -110,8 +110,8 @@
             filePath = "CaliQuake/Renderer.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "59"
-            endingLineNumber = "59"
+            startingLineNumber = "62"
+            endingLineNumber = "62"
             landmarkName = "update(text:debug:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -126,8 +126,8 @@
             filePath = "CaliQuake/Renderer.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "76"
-            endingLineNumber = "76"
+            startingLineNumber = "83"
+            endingLineNumber = "83"
             landmarkName = "draw(in:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -142,8 +142,8 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "85"
-            endingLineNumber = "85"
+            startingLineNumber = "86"
+            endingLineNumber = "86"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -158,8 +158,8 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "196"
-            endingLineNumber = "196"
+            startingLineNumber = "199"
+            endingLineNumber = "199"
             landmarkName = "parse(_:prev:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -174,8 +174,8 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "235"
-            endingLineNumber = "235"
+            startingLineNumber = "251"
+            endingLineNumber = "251"
             landmarkName = "parse(_:prev:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -190,9 +190,57 @@
             filePath = "CaliQuake/PsuedoTerminal.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "184"
-            endingLineNumber = "184"
+            startingLineNumber = "186"
+            endingLineNumber = "186"
             landmarkName = "read()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "A7D34FDA-B04B-49F9-9C40-2C6C2285A153"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CaliQuake/CaliQuakeApp.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "326"
+            endingLineNumber = "326"
+            landmarkName = "parse(_:prev:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "8CC751E0-4300-4042-9AC9-144AB7B7D7C9"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CaliQuake/Renderer.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "193"
+            endingLineNumber = "193"
+            landmarkName = "makeImage(text:font:size:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "04203007-2808-4706-B81E-C87CDC876652"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CaliQuake/Renderer.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "73"
+            endingLineNumber = "73"
+            landmarkName = "draw(in:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

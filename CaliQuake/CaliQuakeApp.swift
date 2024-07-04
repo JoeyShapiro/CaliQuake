@@ -37,7 +37,7 @@ struct CaliQuakeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     let fontRatio: CGFloat = 5/3
     let fontHuh: CGFloat = 1.1
-    let font = NSFont.monospacedSystemFont(ofSize: 12, weight: NSFont.Weight(rawValue: 0.1))
+    let font = NSFont.monospacedSystemFont(ofSize: 11, weight: NSFont.Weight(rawValue: 0.0))
     @State var size = 500.0
     @State var isDebug = true
     let rows = 24
@@ -47,7 +47,8 @@ struct CaliQuakeApp: App {
         WindowGroup {
             ZStack {
                 MetalView(textBinding: $text, font: font, debug: $isDebug, rows: self.rows, cols: self.cols)
-                    .frame(width: (font.pointSize * CGFloat(self.cols) / fontRatio ), height: (font.pointSize * fontHuh * CGFloat(self.rows)))
+                    .frame(width: (7 * CGFloat(self.cols) ), height: (14 * CGFloat(self.rows)))
+//                    .frame(width: (font.pointSize * CGFloat(self.cols) / fontRatio ), height: (font.pointSize * fontHuh * CGFloat(self.rows)))
                     .focusable()
                     .focused($focused)
                     .focusEffectDisabled()
@@ -182,7 +183,7 @@ struct CaliQuakeApp: App {
     // using all of prev char could be useful
     func parse(_ stdout: Data, prev: AnsiChar?) -> [AnsiChar] {
         //y: (text.last?.y ?? 0), x: (text.last?.x ?? 0)
-        var curChar = prev ?? AnsiChar(char: "�", fg: .white, x: 0, y: 0, width: 0)
+        var curChar = prev ?? AnsiChar(char: "�", fg: .white, font: .regular, x: 0, y: 0, width: 0)
         var isEsc = false
         var isMeta = false
         var parsed: [AnsiChar] = []
@@ -191,6 +192,8 @@ struct CaliQuakeApp: App {
         var row = curChar.y
         var col = curChar.x
         var sequence = Data()
+        // TODO need terminal state
+        var keypadMode = ""
         
         var i = 0
         while i < stdout.count {
@@ -200,11 +203,24 @@ struct CaliQuakeApp: App {
                 // esc [ 6 9 7 ;
                 //   0 1 2 3 4 5
                 i += 1 // "["
-                // TODO bad
-                if i+3 > stdout.count {
-                    break
+                
+                // string terminator
+                if stdout[i] == 92 /* \ */ {
+                    isEsc = false
+                    continue
+                } else if stdout[i] == 62 /* > */ {
+                    keypadMode = "app"
+                    isEsc = false
+                    continue
+                } else if stdout[i] == 61 /* = */ {
+                    keypadMode = "num"
+                    isEsc = false
+                    continue
                 }
-                isMeta = stdout[i+1] == 54 /* 6 */ && stdout[i+2] == 57 /* 9 */ && stdout[i+3] == 55 /* 7 */
+                
+                if i+3 < stdout.count {
+                    isMeta = stdout[i+1] == 54 /* 6 */ && stdout[i+2] == 57 /* 9 */ && stdout[i+3] == 55 /* 7 */
+                }
                 if isMeta {
                     i += 3
                 }
@@ -283,6 +299,11 @@ struct CaliQuakeApp: App {
                             switch str {
                             case -1:
                                 print("bad")
+                            case 0: // default
+                                curChar.fg = .white
+                                curChar.font = .regular
+                            case 1:
+                                curChar.font = .bold
                             case 30:
                                 curChar.fg = .black
                             case 31:
@@ -301,7 +322,7 @@ struct CaliQuakeApp: App {
                                 curChar.fg = .white
                             case 39:
                                 curChar.fg = .white
-                            default: // 0
+                            default:
                                 curChar.fg = .debugMagenta
                             }
                         }

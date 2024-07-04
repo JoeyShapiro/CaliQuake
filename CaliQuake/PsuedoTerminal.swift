@@ -9,7 +9,8 @@ import Foundation
 import Dispatch
 
 class PseudoTerminal {
-    private var shell = "/usr/bin/login".withCString(strdup) // /opt/homebrew/bin/nu
+//    private var shell = "/usr/bin/login".withCString(strdup) // /opt/homebrew/bin/nu
+    private var shell = "/bin/zsh".withCString(strdup)
     private var fileActions: posix_spawn_file_actions_t? = nil
     private var spawnAttr: posix_spawnattr_t? = nil
     private var master: Int32 = 0
@@ -109,8 +110,8 @@ class PseudoTerminal {
         print("unblock done")
         
         // Prepare the arguments array
-//        let arguments: [String] = []
-        let arguments = [ "-fp", "oniichan", "/bin/zsh", "-fc", "exec -a -zsh /bin/zsh" ]
+        let arguments: [String] = []
+//        let arguments = [ "-fp", "oniichan", "/bin/zsh", "-fc", "exec -a -zsh /bin/zsh" ]
         let args = [shell] + arguments.map { strdup($0) }
         defer { for arg in args { free(arg) } }
         let env = environment.map({ "\($0)=\($1)" }) 
@@ -173,7 +174,8 @@ class PseudoTerminal {
                             print("\"", terminator: "")
                             for c in output {
                                 let val = c.unicodeScalars.first?.value ?? 0
-                                if !c.isWhitespace {
+                                // is printable ascii character
+                                if let ascii = c.asciiValue, ascii > 32 && ascii < 127 {
                                     print(c, terminator: "")
                                 } else {
                                     print("\\u\(val)", terminator: "")
@@ -233,7 +235,37 @@ import SwiftUI
 struct AnsiChar {
     var char: Character
     var fg: NSColor // Color causes crash
+    var font: FontStyle
     var x: Int
     var y: Int
     var width: Int // need this, but want \n to be at end of line
+}
+
+enum FontStyle {
+    case regular
+    case bold
+    case italic
+    case boldItalic
+    
+    func font(size: CGFloat) -> NSFont {
+        switch self {
+        case .regular:
+            return NSFont.monospacedSystemFont(ofSize: size, weight: .regular)
+        case .bold:
+            return NSFont.monospacedSystemFont(ofSize: size, weight: .bold)
+        case .italic:
+            return NSFont.monospacedSystemFont(ofSize: size, weight: .regular).withTraits(.italicFontMask)
+        case .boldItalic:
+            return NSFont.monospacedSystemFont(ofSize: size, weight: .bold).withTraits(.italicFontMask)
+        }
+    }
+}
+
+extension NSFont {
+    func withTraits(_ traits: NSFontTraitMask) -> NSFont {
+        guard let newFont = NSFontManager.shared.font(withFamily: familyName ?? "", traits: traits, weight: 0, size: pointSize) else {
+            return self
+        }
+        return newFont
+    }
 }
