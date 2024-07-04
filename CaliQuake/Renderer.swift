@@ -14,11 +14,14 @@ class Renderer: NSObject {
     var vertexBuffer: MTLBuffer!
     private var text: [AnsiChar]
     private var texture: MTLTexture?
+    private var textureCursor: MTLTexture?
     private var isDirty = true
     let font: NSFont
     private var debug: Bool
     let width: CGFloat
     let height: CGFloat
+    var mtime: Float = 0.0
+    var lastUpdateTime: TimeInterval = Date().timeIntervalSince1970
 
     init(device: MTLDevice, font: NSFont, debug: Bool, cols: Int, rows: Int) {
         self.device = device
@@ -64,7 +67,9 @@ class Renderer: NSObject {
 //            guard let font = NSFont(name: "SFMono-Regular", size: 12) else {
 //                fatalError("cannot find font")
 //            }
-            let imageData = convertCGImageToData(makeImage(text: self.text, font: self.font, size: CGSize(width: self.width, height: self.height))!)!
+            let size = CGSize(width: self.width, height: self.height)
+            let imageData = convertCGImageToData(makeImage(text: self.text, font: self.font, size: size)!)!
+            let imageCursor = convertCGImageToData(makeCursor(size: size)!)!
             
             let textureLoader = MTKTextureLoader(device: view.device!)
             
@@ -73,6 +78,7 @@ class Renderer: NSObject {
                 .generateMipmaps : true
             ]
             self.texture = try? textureLoader.newTexture(data: imageData, options: textureOptions)
+            self.textureCursor = try? textureLoader.newTexture(data: imageCursor, options: textureOptions)
             
             isDirty = false
         }
@@ -87,11 +93,21 @@ class Renderer: NSObject {
             return
         }
         
+        let currentTime = Date().timeIntervalSince1970
+        let deltaTime = currentTime - lastUpdateTime
+        self.mtime += Float(deltaTime * 1000) // Convert to milliseconds
+        lastUpdateTime = currentTime
+        
+        // Prevent timeInMilliseconds from growing too large
+        self.mtime = fmodf(self.mtime, 1000000) // Reset every million milliseconds
+        
         encoder.setRenderPipelineState(pipelineState!)
         var resolution = vector_float2(Float(view.drawableSize.width), Float(view.drawableSize.height))
         encoder.setFragmentBytes(&resolution, length: MemoryLayout<vector_float2>.size, index: 0)
         encoder.setFragmentTexture(texture, index: 0)
-//        encoder.setFragmentTexture(texture, index: 1)
+        encoder.setFragmentTexture(self.textureCursor, index: 1)
+        // Pass time to the shader
+        encoder.setFragmentBytes(&self.mtime, length: MemoryLayout<Float>.size, index: 1);
         
         let vertices: [Float] = [
             -1.0, -1.0,
@@ -185,9 +201,31 @@ class Renderer: NSObject {
             #endif
         }
         
+        NSGraphicsContext.restoreGraphicsState()
+        
+        // Create a texture from the bitmap context
+        guard let image = context.makeImage() else { return nil }
+        
+        return image
+    }
+    
+    private func makeCursor(size: CGSize) -> CGImage? {
+        // Create a bitmap context
+        let scale = NSScreen.main?.backingScaleFactor ?? 1.0
+        let width = Int(size.width * scale)
+        let height = Int(size.height * scale)
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue
+        guard let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 4 * width, space: colorSpace, bitmapInfo: bitmapInfo) else { return nil }
+        
+        context.scaleBy(x: scale, y: scale)
+        
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
+        
         // TODO test
-        let last_x = text.last?.x ?? 0
-        let last_y = text.last?.y ?? 0
+        let last_x = self.text.last?.x ?? 0
+        let last_y = self.text.last?.y ?? 0
         let pos = CGPoint(x: (CGFloat(last_x+1) * 7), y: CGFloat(size.height-14)-(CGFloat(last_y) * 14))
         let rect = CGRect(origin: pos, size: CGSize(width: 7, height: 14))
         context.setFillColor(NSColor.white.cgColor)

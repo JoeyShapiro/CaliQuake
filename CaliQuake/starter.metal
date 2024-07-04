@@ -34,7 +34,9 @@ half3 sampleTexture(texture2d<half> tex, float2 uv, sampler texSampler) {
  */
 fragment half4 fragmentShader(VertexOut in [[ stage_in ]],
                               texture2d<half> tex [[ texture(0) ]],
-                              constant float2& resolution [[buffer(0)]]) {
+                              texture2d<half> cursor [[ texture(1) ]],
+                              constant float2& resolution [[buffer(0)]],
+                              constant float &mtime [[ buffer(1) ]]) {
     constexpr sampler texSampler(mag_filter::linear, min_filter::linear);
 //    half4 color = tex.sample(texSampler, in.texCoord);
     
@@ -54,5 +56,10 @@ fragment half4 fragmentShader(VertexOut in [[ stage_in ]],
     
     col /= (samples * samples);
     
-    return half4(col, 1.0h);
+    float speed = mtime / 500;
+    
+    half4 color_cursor = cursor.sample(texSampler, in.texCoord);
+    color_cursor = half4(cos(color_cursor.rgb * speed), color_cursor.a);
+    
+    return mix(half4(col, 1.0h), color_cursor, color_cursor.a);
 }
