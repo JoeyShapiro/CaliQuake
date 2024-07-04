@@ -33,7 +33,6 @@ class PseudoTerminal {
         
         var name = [CChar](repeating: 0, count: 1024)
         self.pid = openpty(&self.master, &self.slave, &name, &term, &winp)
-//        self.pid = forkpty(&self.master, &name, &term, &winp)
         if self.pid == 0 {
             // child
             self.child()

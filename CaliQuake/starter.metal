@@ -8,46 +8,6 @@
 #include <metal_stdlib>
 using namespace metal;
 
-//// Structure to hold the input attributes from the vertex shader
-//struct VertexOut {
-//    float4 position [[position]];
-//    float4 color;
-//};
-//
-//// Fragment shader function
-//fragment float4 fragment_main(VertexOut in [[stage_in]]) {
-//    // Output the color passed from the vertex shader
-//    return in.color;
-//}
-//
-//// Structure to hold the input attributes for the vertex shader
-//struct VertexIn {
-//    float4 position [[attribute(0)]];
-//    float4 color [[attribute(1)]];
-//};
-//
-//// Vertex shader function
-//vertex VertexOut vertex_main(VertexIn in [[stage_in]]) {
-//    VertexOut out;
-//    out.position = in.position;
-//    out.color = in.color;
-//    return out;
-//}
-//
-//vertex float4 init(const device float2 * vertices[[buffer(0)]], const uint vid[[vertex_id]]) {
-//
-//    return float4(vertices[vid], 0, 1);
-//}
-//
-//fragment float4 draw(const device long * tilemap[[buffer(0)]], const float4 coordinates [[position]]) {
-//
-//    int x = int(coordinates.x) / 80;
-//    int y = int(coordinates.y) / 80;
-//    int tile = tilemap[y * 16 + x];
-//
-//    return float4(float(tile), 0, 0, 1);
-//}
-
 struct VertexOut {
     float4 position [[ position ]];
     float2 texCoord;

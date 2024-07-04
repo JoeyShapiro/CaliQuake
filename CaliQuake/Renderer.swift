@@ -15,13 +15,10 @@ class Renderer: NSObject {
     private var text: [AnsiChar]
     private var texture: MTLTexture?
     private var isDirty = true
-    let ratio: CGFloat = 5/3
-    let huh: CGFloat = 1.1
     let font: NSFont
     private var debug: Bool
     let width: CGFloat
     let height: CGFloat
-    let mps: Bool
 
     init(device: MTLDevice, font: NSFont, debug: Bool, cols: Int, rows: Int) {
         self.device = device
@@ -45,9 +42,8 @@ class Renderer: NSObject {
         self.debug = debug
         
         // all of these numbers must match
-        self.width = 7 * CGFloat(cols) /// self.ratio
-        self.height = 14 * CGFloat(rows)// * self.huh
-        self.mps = false
+        self.width = 7 * CGFloat(cols)
+        self.height = 14 * CGFloat(rows)
 
         super.init()
     }
@@ -63,9 +59,7 @@ class Renderer: NSObject {
     }
 
     func draw(in view: MTKView) {
-        // i changed the dimensions, removed verts, use tex coords, and changed the ordering
         if isDirty {
-            // NSFontManager
             // NSFont.monospacedSystemFont(ofSize: 12, weight: NSFont.Weight(rawValue: 0.1))
 //            guard let font = NSFont(name: "SFMono-Regular", size: 12) else {
 //                fatalError("cannot find font")
@@ -172,14 +166,6 @@ class Renderer: NSObject {
             .paragraphStyle: paragraphStyle,
             .foregroundColor: NSColor.white, // if the data is not the right type, it will crash
         ]
-//        for y in (0...64) {
-//            let pos = CGPoint(x: (CGFloat(0) * font.pointSize / 1.5), y: CGFloat(CGFloat(y) * font.pointSize / 1.5))
-//            let rect = CGRect(origin: pos, size: CGSize(width: font.pointSize, height: font.pointSize))
-//            String(y).draw(in: rect, withAttributes: attributes)
-//        }
-        
-        // TODO get dimensions of app
-        // dimensions must be getting added somewhere
         
         for ac in text {
             attributes[.foregroundColor] = ac.fg
@@ -203,119 +189,6 @@ class Renderer: NSObject {
         // Create a texture from the bitmap context
         guard let image = context.makeImage() else { return nil }
         
-        
-        let imageData = convertCGImageToData(image)!
-        
-        let textureLoader = MTKTextureLoader(device: self.device!)
-        
-        let textureOptions: [MTKTextureLoader.Option : Any] = [
-            .SRGB : false,
-            .generateMipmaps : true
-        ]
-        self.texture = try? textureLoader.newTexture(data: imageData, options: textureOptions)
-        let cicontext = CIContext()
-        let url = URL(fileURLWithPath: "/Users/oniichan/Downloads/texture2.png")
-        let ciimage = CIImage(cgImage: self.texture!.toCGImage()!)
-        do {
-            try cicontext.writePNGRepresentation(of: ciimage, to: url, format: .RGBA8, colorSpace: ciimage.colorSpace!)
-        } catch {
-            
-        }
-        
         return image
-    }
-
-    private func createTextTexture(text: String, font: NSFont, size: CGSize) -> MTLTexture? {
-        // Create a bitmap context
-        let scale = NSScreen.main?.backingScaleFactor ?? 1.0
-        let width = Int(size.width * scale)
-        let height = Int(size.height * scale)
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue
-        guard let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 4 * width, space: colorSpace, bitmapInfo: bitmapInfo) else { return nil }
-        
-        context.scaleBy(x: scale, y: scale)
-        NSGraphicsContext.saveGraphicsState()
-        NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
-        
-        // Draw the text
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .center
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: font,
-            .paragraphStyle: paragraphStyle,
-            .foregroundColor: NSColor.white
-        ]
-        let rect = CGRect(origin: .zero, size: size)
-        text.draw(in: rect, withAttributes: attributes)
-        
-        NSGraphicsContext.restoreGraphicsState()
-        
-        // Create a texture from the bitmap context
-        guard let image = context.makeImage() else { return nil }
-
-//        let region = MTLRegionMake2D(0, 0, width, height)
-//        let bytesPerRow = 4 * width
-//        let data = context.data!
-//        texture.replace(region: region, mipmapLevel: 0, withBytes: data, bytesPerRow: bytesPerRow)
-        
-        return createTexture(from: image)
-    }
-    
-    private func createTexture(from image: CGImage) -> MTLTexture? {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: image.width, height: image.height, mipmapped: false)
-        textureDescriptor.usage = [.shaderRead, .shaderWrite]
-        
-        guard let texture = device.makeTexture(descriptor: textureDescriptor) else {
-            fatalError("Failed to create texture")
-        }
-        
-        let bytesPerPixel = 4
-        let bytesPerRow = bytesPerPixel * image.width
-        let imageData = UnsafeMutableRawPointer.allocate(byteCount: bytesPerRow * image.height, alignment: 1)
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue
-        
-        guard let context = CGContext(data: imageData, width: image.width, height: image.height, bitsPerComponent: 8, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: bitmapInfo) else {
-            fatalError("Failed to create CGContext")
-        }
-        
-        context.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
-        
-        let region = MTLRegionMake2D(0, 0, image.width, image.height)
-        texture.replace(region: region, mipmapLevel: 0, withBytes: imageData, bytesPerRow: bytesPerRow)
-        
-        imageData.deallocate()
-        
-        return texture
-    }
-
-}
-
-extension MTLTexture {
-    func toCGImage() -> CGImage? {
-        let width = self.width
-        let height = self.height
-        let bytesPerRow = width * 4
-        var bytes = [UInt8](repeating: 0, count: width * height * 4)
-        
-        self.getBytes(&bytes, bytesPerRow: bytesPerRow, from: MTLRegionMake2D(0, 0, width, height), mipmapLevel: 0)
-        
-        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
-        guard let provider = CGDataProvider(data: Data(bytes: bytes, count: bytes.count) as CFData) else {
-            return nil
-        }
-        
-        return CGImage(width: width,
-                       height: height,
-                       bitsPerComponent: 8,
-                       bitsPerPixel: 32,
-                       bytesPerRow: bytesPerRow,
-                       space: CGColorSpaceCreateDeviceRGB(),
-                       bitmapInfo: bitmapInfo,
-                       provider: provider,
-                       decode: nil,
-                       shouldInterpolate: true,
-                       intent: .defaultIntent)
     }
 }

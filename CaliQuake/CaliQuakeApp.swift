@@ -35,8 +35,8 @@ struct CaliQuakeApp: App {
     @FocusState private var focused: Bool
     @State private var pty: PseudoTerminal? = nil
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    let fontRatio: CGFloat = 5/3
-    let fontHuh: CGFloat = 1.1
+//    let fontRatio: CGFloat = 5/3
+//    let fontHuh: CGFloat = 1.1
     let font = NSFont.monospacedSystemFont(ofSize: 11, weight: NSFont.Weight(rawValue: 0.0))
     @State var size = 500.0
     @State var isDebug = true
@@ -104,7 +104,7 @@ struct CaliQuakeApp: App {
                         }
                     }
                 // getting the location causes a re-init
-                PopView(fontHuh: fontHuh, fontRatio: fontRatio, text: $text, pointSize: font.pointSize, debug: $isDebug, rows: self.rows, cols: self.cols)
+                PopView(text: $text, pointSize: font.pointSize, debug: $isDebug, rows: self.rows, cols: self.cols)
                 //                .alert("Important message", isPresented: $show) {
                 //                    Button("OK") { }
                 //                }

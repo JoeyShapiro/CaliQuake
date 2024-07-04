@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct PopView: View {
-    let fontRatio: CGFloat
-    let fontHuh: CGFloat
     let pointSize: CGFloat
     @State public var popPos: CGPoint
     @State public var visible: Bool
@@ -21,21 +19,19 @@ struct PopView: View {
     let width: CGFloat
     let height: CGFloat
     
-    init(fontHuh: CGFloat, fontRatio: CGFloat, text: Binding<[AnsiChar]>, pointSize: CGFloat, debug: Binding<Bool>, rows: Int, cols: Int) {
+    init(text: Binding<[AnsiChar]>, pointSize: CGFloat, debug: Binding<Bool>, rows: Int, cols: Int) {
         self.popPos = CGPoint(x: -1.0, y: -1.0)
         self.visible = false
         self._text = text
         
-        self.fontHuh = fontHuh
-        self.fontRatio = fontRatio
         self.pointSize = pointSize
         self._debug = debug
         
         self.rows = rows
         self.cols = cols
         
-        self.width = (self.pointSize * CGFloat(self.cols) / self.fontRatio )
-        self.height = (self.pointSize * self.fontHuh * CGFloat(self.rows))
+        self.width = (7 * CGFloat(self.cols) )
+        self.height = (14 * CGFloat(self.rows))
     }
     
     var body: some View {
@@ -50,8 +46,8 @@ struct PopView: View {
 #if DEBUG
                             if debug {
                                 // TODO kinda want on drage and stuff, but that may lead back to start
-                                let x = Int(popPos.x / self.pointSize * self.fontRatio)
-                                let y = Int(popPos.y / self.pointSize / self.fontHuh)
+                                let x = Int(popPos.x / self.pointSize)
+                                let y = Int(popPos.y / self.pointSize)
                                 if let ac = self.text.first(where: { ac in
                                     return ac.x == x && ac.y == y
                                 }) {
