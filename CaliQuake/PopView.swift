@@ -46,8 +46,8 @@ struct PopView: View {
 #if DEBUG
                             if debug {
                                 // TODO kinda want on drage and stuff, but that may lead back to start
-                                let x = Int(popPos.x / self.pointSize)
-                                let y = Int(popPos.y / self.pointSize)
+                                let x = Int(popPos.x / 7)
+                                let y = Int(popPos.y / 14)
                                 if let ac = self.text.first(where: { ac in
                                     return ac.x == x && ac.y == y
                                 }) {
