@@ -48,6 +48,8 @@ struct CaliQuakeApp: App {
             ZStack {
                 MetalView(textBinding: $text, font: font, debug: $isDebug, rows: self.rows, cols: self.cols)
                     .frame(width: (7 * CGFloat(self.cols) ), height: (14 * CGFloat(self.rows)))
+                    .padding(5)
+                    .background(Color.black)
 //                    .frame(width: (font.pointSize * CGFloat(self.cols) / fontRatio ), height: (font.pointSize * fontHuh * CGFloat(self.rows)))
                     .focusable()
                     .focused($focused)
@@ -125,15 +127,15 @@ struct CaliQuakeApp: App {
         pty = appDelegate.pty
         
         // kill the prev
-        do {
-            if let state = try sharedModelContainer.mainContext.fetch(FetchDescriptor<AppState>()).first {
-                if state.childpty > 0 {
-                    _ = pty?.write(command: "kill \(state.childpty)\n")
-                }
-            }
-        } catch {
-            
-        }
+//        do {
+//            if let state = try sharedModelContainer.mainContext.fetch(FetchDescriptor<AppState>()).first {
+//                if state.childpty > 0 {
+//                    _ = pty?.write(command: "kill \(state.childpty)\n")
+//                }
+//            }
+//        } catch {
+//            
+//        }
         
         sharedModelContainer.mainContext.insert(AppState(child: pty?.pid ?? 0))
         do {
