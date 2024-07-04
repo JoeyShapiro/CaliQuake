@@ -183,7 +183,7 @@ struct CaliQuakeApp: App {
     // using all of prev char could be useful
     func parse(_ stdout: Data, prev: AnsiChar?) -> [AnsiChar] {
         //y: (text.last?.y ?? 0), x: (text.last?.x ?? 0)
-        var curChar = prev ?? AnsiChar()
+        var curChar = prev ?? AnsiChar(x: 0, y: 0)
         var isEsc = false
         var isMeta = false
         var parsed: [AnsiChar] = []

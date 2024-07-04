@@ -247,6 +247,15 @@ struct AnsiChar {
         self.y     = -1
         self.width = 0
     }
+    
+    init(x: Int, y: Int) {
+        self.char  = "�"
+        self.fg    = .white
+        self.font  = .regular
+        self.x     = 0
+        self.y     = 0
+        self.width = 0
+    }
 }
 
 enum FontStyle {
