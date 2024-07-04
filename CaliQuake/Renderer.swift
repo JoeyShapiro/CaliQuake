@@ -91,6 +91,7 @@ class Renderer: NSObject {
         var resolution = vector_float2(Float(view.drawableSize.width), Float(view.drawableSize.height))
         encoder.setFragmentBytes(&resolution, length: MemoryLayout<vector_float2>.size, index: 0)
         encoder.setFragmentTexture(texture, index: 0)
+//        encoder.setFragmentTexture(texture, index: 1)
         
         let vertices: [Float] = [
             -1.0, -1.0,
@@ -183,6 +184,14 @@ class Renderer: NSObject {
             }
             #endif
         }
+        
+        // TODO test
+        let last_x = text.last?.x ?? 0
+        let last_y = text.last?.y ?? 0
+        let pos = CGPoint(x: (CGFloat(last_x+1) * 7), y: CGFloat(size.height-14)-(CGFloat(last_y) * 14))
+        let rect = CGRect(origin: pos, size: CGSize(width: 7, height: 14))
+        context.setFillColor(NSColor.white.cgColor)
+        context.fill(rect)
         
         NSGraphicsContext.restoreGraphicsState()
         
