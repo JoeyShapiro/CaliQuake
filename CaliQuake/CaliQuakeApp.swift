@@ -183,7 +183,7 @@ struct CaliQuakeApp: App {
     // using all of prev char could be useful
     func parse(_ stdout: Data, prev: AnsiChar?) -> [AnsiChar] {
         //y: (text.last?.y ?? 0), x: (text.last?.x ?? 0)
-        var curChar = prev ?? AnsiChar(char: "�", fg: .white, font: .regular, x: 0, y: 0, width: 0)
+        var curChar = prev ?? AnsiChar()
         var isEsc = false
         var isMeta = false
         var parsed: [AnsiChar] = []
@@ -194,6 +194,8 @@ struct CaliQuakeApp: App {
         var sequence = Data()
         // TODO need terminal state
         var keypadMode = ""
+        var csi = false // [
+        var osc = false // ]
         
         var i = 0
         while i < stdout.count {
@@ -204,17 +206,36 @@ struct CaliQuakeApp: App {
                 //   0 1 2 3 4 5
                 i += 1 // "["
                 
+                switch stdout[i] {
+                case 91: /* [ */
+                    csi = true
+                case 93: /* ] */
+                    osc = true
+                default:
+                    csi = false
+                    osc = false
+                }
+                
                 // string terminator
                 if stdout[i] == 92 /* \ */ {
                     isEsc = false
+                    csi = false
+                    osc = false
+                    i += 1
                     continue
                 } else if stdout[i] == 62 /* > */ {
                     keypadMode = "app"
                     isEsc = false
+                    csi = false
+                    osc = false
+                    i += 1
                     continue
                 } else if stdout[i] == 61 /* = */ {
                     keypadMode = "num"
                     isEsc = false
+                    csi = false
+                    osc = false
+                    i += 1
                     continue
                 }
                 
@@ -288,9 +309,11 @@ struct CaliQuakeApp: App {
             if isMeta && stdout[i] == bel {
                 isEsc = false
                 isMeta = false
+                csi = false
+                osc = false
                 sequence.removeAll()
             }
-            if isEsc && !isMeta && (stdout[i] == 109 /* m */ || stdout[i] == 104 /* h */) {
+            if isEsc && !isMeta && csi && (stdout[i] == 109 /* m */ || stdout[i] == 104 /* h */) {
                 // parse sequence now
                 if sequence.removeLast() == 109 {
                     let numbers = sequence.split(separator: 59 /* ; */)

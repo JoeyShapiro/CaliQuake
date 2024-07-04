@@ -11,7 +11,7 @@ struct PopView: View {
     let pointSize: CGFloat
     @State public var popPos: CGPoint
     @State public var visible: Bool
-    @State var popAC = AnsiChar(char: "�", fg: .clear, font: .regular, x: -1, y: -1, width: 1)
+    @State var popAC = AnsiChar()
     @Binding var text: [AnsiChar]
     @Binding var debug: Bool
     let rows: Int

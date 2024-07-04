@@ -238,6 +238,15 @@ struct AnsiChar {
     var x: Int
     var y: Int
     var width: Int // need this, but want \n to be at end of line
+    
+    init() {
+        self.char  = "�"
+        self.fg    = .white
+        self.font  = .regular
+        self.x     = -1
+        self.y     = -1
+        self.width = 0
+    }
 }
 
 enum FontStyle {
