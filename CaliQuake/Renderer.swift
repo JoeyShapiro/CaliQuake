@@ -235,7 +235,7 @@ class Renderer: NSObject {
         
         // Create a texture from the bitmap context
         guard let image = context.makeImage() else { return nil }
-        
+
         return image
     }
 }

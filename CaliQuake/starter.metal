@@ -58,8 +58,49 @@ fragment half4 fragmentShader(VertexOut in [[ stage_in ]],
     
     float speed = mtime / 500;
     
-    half4 color_cursor = cursor.sample(texSampler, in.texCoord);
-    color_cursor = half4(cos(color_cursor.rgb * speed), color_cursor.a);
+    half4 cursorBase = cursor.sample(texSampler, in.texCoord);
     
-    return mix(half4(col, 1.0h), color_cursor, color_cursor.a);
+//    // Cursor blur effect
+//    // the meat and potatos
+//    float2 downsampleStep = resolution / resolution;  // Adjust for blur strength
+//    float2 downsampledUV = floor(uv / downsampleStep) * downsampleStep;
+//    
+//    half4 blurredColor = half4(0.0h);
+//    for (int y = 0; y < 2; y++) {
+//        for (int x = 0; x < 2; x++) {
+//            float2 offset = float2(x, y) * downsampleStep * 0.5;
+//            blurredColor += cursor.sample(texSampler, downsampledUV + offset);
+//        }
+//    }
+//    blurredColor *= 0.25h;  // Average the samples
+//    blurredColor = cursor.sample(texSampler, downsampledUV);
+    // TODO use gpu downsampling blur
+    constexpr sampler qsampler(coord::normalized,
+                               address::clamp_to_edge);
+    float xPixel = (1 / resolution.x) * 3;
+    float yPixel = (1 / resolution.y) * 2;
+    
+    half3 blur = 0;
+    blur += cursor.sample(qsampler, float2(in.texCoord.x - 4.0*xPixel, in.texCoord.y - 4.0*yPixel)).rgb * 0.0162162162;
+    blur += cursor.sample(qsampler, float2(in.texCoord.x - 3.0*xPixel, in.texCoord.y - 3.0*yPixel)).rgb * 0.0540540541;
+    blur += cursor.sample(qsampler, float2(in.texCoord.x - 2.0*xPixel, in.texCoord.y - 2.0*yPixel)).rgb * 0.1216216216;
+    blur += cursor.sample(qsampler, float2(in.texCoord.x - 1.0*xPixel, in.texCoord.y - 1.0*yPixel)).rgb * 0.1945945946;
+    
+    blur += cursor.sample(qsampler, in.texCoord).rgb * 0.2270270270;
+    
+    blur += cursor.sample(qsampler, float2(in.texCoord.x + 1.0*xPixel, in.texCoord.y + 1.0*yPixel)).rgb * 0.1945945946;
+    blur += cursor.sample(qsampler, float2(in.texCoord.x + 2.0*xPixel, in.texCoord.y + 2.0*yPixel)).rgb * 0.1216216216;
+    blur += cursor.sample(qsampler, float2(in.texCoord.x + 3.0*xPixel, in.texCoord.y + 3.0*yPixel)).rgb * 0.0540540541;
+    blur += cursor.sample(qsampler, float2(in.texCoord.x + 4.0*xPixel, in.texCoord.y + 4.0*yPixel)).rgb * 0.0162162162;
+    
+    half thresh = 0.1;
+    // worst: 0.1*1 + 0.0*1 + 0.0*1 = 0.1
+    // blur.r > 0.1 || blur.g > 0.1 || blur.b > 0.1 ? 1.0 : 0.0
+    half alpha = dot(blur, 1.0) > thresh;
+    half4 finalCursorColor = cursorBase + half4(blur, alpha);
+    
+    // Apply the time-based effect
+    finalCursorColor = half4(cos(finalCursorColor.rgb * speed), finalCursorColor.a);
+    
+    return mix(half4(col, 1.0h), finalCursorColor, finalCursorColor.a);
 }
