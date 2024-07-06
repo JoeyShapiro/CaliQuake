@@ -308,7 +308,7 @@ struct CaliQuakeApp: App {
             // its doing the auto complete, so i have to handle escapes now
             
             // shrug
-            if isMeta && stdout[i] == bel {
+            if (isMeta || osc) && stdout[i] == bel {
                 isEsc = false
                 isMeta = false
                 csi = false
@@ -354,6 +354,7 @@ struct CaliQuakeApp: App {
                     }
                 }
                 isEsc = false
+                csi = false
                 sequence.removeAll()
             }
             
