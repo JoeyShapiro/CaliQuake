@@ -326,9 +326,14 @@ struct CaliQuakeApp: App {
                                 print("bad")
                             case 0: // default
                                 curChar.fg = .white
+                                curChar.bg = .clear
                                 curChar.font = .regular
                             case 1:
                                 curChar.font = .bold
+                            case 7: // TODO not sure if correct way, but makes sense
+                                curChar.invert = true
+                            case 27:
+                                curChar.invert = false
                             case 30:
                                 curChar.fg = .black
                             case 31:
@@ -347,6 +352,24 @@ struct CaliQuakeApp: App {
                                 curChar.fg = .white
                             case 39:
                                 curChar.fg = .white
+                            case 40:
+                                curChar.bg = .black
+                            case 41:
+                                curChar.bg = .red
+                            case 42:
+                                curChar.bg = .green
+                            case 43:
+                                curChar.bg = .yellow
+                            case 44:
+                                curChar.bg = .blue
+                            case 45:
+                                curChar.bg = .magenta
+                            case 46:
+                                curChar.bg = .cyan
+                            case 47:
+                                curChar.bg = .white
+                            case 49:
+                                curChar.bg = .clear
                             default:
                                 curChar.fg = .debugMagenta
                             }

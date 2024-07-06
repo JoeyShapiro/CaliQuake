@@ -182,10 +182,18 @@ class Renderer: NSObject {
             .font: style.font(size: self.font.pointSize),
             .paragraphStyle: paragraphStyle,
             .foregroundColor: NSColor.white, // if the data is not the right type, it will crash
+            .backgroundColor: NSColor.clear,
         ]
         
         for ac in text {
-            attributes[.foregroundColor] = ac.fg
+            if ac.invert {
+                attributes[.foregroundColor] = ac.bg == NSColor.clear ? NSColor.black : ac.bg
+                attributes[.backgroundColor] = ac.fg
+            } else {
+                attributes[.foregroundColor] = ac.fg
+                attributes[.backgroundColor] = ac.bg
+            }
+            
             attributes[.font] = ac.font.font(size: self.font.pointSize)
             
             let pos = CGPoint(x: (CGFloat(ac.x) * 7), y: CGFloat(size.height-14)-(CGFloat(ac.y) * 14))

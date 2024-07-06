@@ -30,8 +30,8 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "335"
-            endingLineNumber = "335"
+            startingLineNumber = "340"
+            endingLineNumber = "340"
             landmarkName = "parse(_:prev:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -46,8 +46,8 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "347"
-            endingLineNumber = "347"
+            startingLineNumber = "352"
+            endingLineNumber = "352"
             landmarkName = "parse(_:prev:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -190,8 +190,8 @@
             filePath = "CaliQuake/CaliQuakeApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "351"
-            endingLineNumber = "351"
+            startingLineNumber = "374"
+            endingLineNumber = "374"
             landmarkName = "parse(_:prev:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -206,8 +206,8 @@
             filePath = "CaliQuake/Renderer.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "196"
-            endingLineNumber = "196"
+            startingLineNumber = "204"
+            endingLineNumber = "204"
             landmarkName = "makeImage(text:font:size:)"
             landmarkType = "7">
          </BreakpointContent>
