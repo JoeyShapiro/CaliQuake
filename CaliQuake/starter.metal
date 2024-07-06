@@ -60,23 +60,8 @@ fragment half4 fragmentShader(VertexOut in [[ stage_in ]],
     
     half4 cursorBase = cursor.sample(texSampler, in.texCoord);
     
-//    // Cursor blur effect
-//    // the meat and potatos
-//    float2 downsampleStep = resolution / resolution;  // Adjust for blur strength
-//    float2 downsampledUV = floor(uv / downsampleStep) * downsampleStep;
-//    
-//    half4 blurredColor = half4(0.0h);
-//    for (int y = 0; y < 2; y++) {
-//        for (int x = 0; x < 2; x++) {
-//            float2 offset = float2(x, y) * downsampleStep * 0.5;
-//            blurredColor += cursor.sample(texSampler, downsampledUV + offset);
-//        }
-//    }
-//    blurredColor *= 0.25h;  // Average the samples
-//    blurredColor = cursor.sample(texSampler, downsampledUV);
+    // Cursor blur effect
     // TODO use gpu downsampling blur
-//    constexpr sampler qsampler(coord::normalized,
-//                               address::clamp_to_edge);
     float xPixel = (1 / resolution.x) * 3;
     float yPixel = (1 / resolution.y) * 2;
     
@@ -97,12 +82,15 @@ fragment half4 fragmentShader(VertexOut in [[ stage_in ]],
     // worst: 0.1*1 + 0.0*1 + 0.0*1 = 0.1
     // blur.r > 0.1 || blur.g > 0.1 || blur.b > 0.1 ? 1.0 : 0.0
     half alpha = dot(blur, 1.0) > thresh;
-    half4 finalCursorColor = cursorBase + half4(blur, alpha);
+    half4 bloomedCursor = cursorBase + half4(blur, alpha);
     
     // Apply the time-based effect
     // simple yet clever :)
     // have to use sin
-    finalCursorColor.rgb = max(sin(finalCursorColor.rgb * speed), 0);
+    half4 finalCursorColor = bloomedCursor;
+    half3 timedCursor = max(sin(bloomedCursor.rgb + speed), 0);
+    // dont let the timer exceed the default or some shit
+    finalCursorColor.rgb = min(timedCursor, finalCursorColor.rgb);
     
     return mix(half4(col, 1.0h), finalCursorColor, finalCursorColor.a);
 }
