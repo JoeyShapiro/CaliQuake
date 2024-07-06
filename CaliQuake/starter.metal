@@ -88,9 +88,8 @@ fragment half4 fragmentShader(VertexOut in [[ stage_in ]],
     // simple yet clever :)
     // have to use sin
     half4 finalCursorColor = bloomedCursor;
-    half3 timedCursor = max(sin(bloomedCursor.rgb + speed), 0);
-    // dont let the timer exceed the default or some shit
-    finalCursorColor.rgb = min(timedCursor, finalCursorColor.rgb);
+    half brightness = sin(speed);
+    finalCursorColor.rgb = max(finalCursorColor.rgb * brightness, 0);
     
     return mix(half4(col, 1.0h), finalCursorColor, finalCursorColor.a);
 }
