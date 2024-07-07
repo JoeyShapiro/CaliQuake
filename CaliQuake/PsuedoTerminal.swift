@@ -177,7 +177,7 @@ class PseudoTerminal {
                                 if let ascii = c.asciiValue, ascii > 32 && ascii < 127 {
                                     print(c, terminator: "")
                                 } else {
-                                    print("\\u\(val)", terminator: "")
+                                    print("\\u(\(val))", terminator: "")
                                 }
                             }
                             print("\"")

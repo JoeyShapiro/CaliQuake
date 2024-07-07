@@ -274,7 +274,7 @@ struct CaliQuakeApp: App {
                     i += 3
                 }
                 
-                col += curChar.width
+                
                 
                 // do action after placing it
                 if stdout[i] == 0xd /* \r */ {
@@ -291,7 +291,11 @@ struct CaliQuakeApp: App {
                     row += 1
                     curChar.width = 0
                 } else if stdout[i] == 0x8 /* BS */ {
-                    col -= curChar.width
+                    let last = text.last(where: { $0.width > 0 })
+                    col -= last?.width ?? 0
+                    curChar.width = 0
+                } else if stdout[i] == bel {
+                    curChar.width = 0
                 } else {
                     curChar.width = 1
                 }
@@ -301,6 +305,9 @@ struct CaliQuakeApp: App {
                 curChar.y = row
                 
                 parsed.append(curChar)
+                
+                col += curChar.width
+                curChar.x = col
                 
                 // handle window size
                 if col > self.cols {
@@ -410,7 +417,6 @@ struct CaliQuakeApp: App {
             i+=1
         }
         
-        print(curChar.x)
         return parsed
     }
 }

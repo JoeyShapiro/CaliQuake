@@ -235,7 +235,7 @@ class Renderer: NSObject {
         NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
         
         // TODO test
-        let pos = CGPoint(x: (CGFloat(curChar.x+1) * 7), y: CGFloat(size.height-14)-(CGFloat(curChar.y) * 14))
+        let pos = CGPoint(x: (CGFloat(curChar.x) * 7), y: CGFloat(size.height-14)-(CGFloat(curChar.y) * 14))
         let rect = CGRect(origin: pos, size: CGSize(width: 7, height: 14))
         context.setFillColor(NSColor.white.cgColor)
         context.fill(rect)
