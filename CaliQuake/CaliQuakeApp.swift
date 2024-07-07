@@ -42,11 +42,12 @@ struct CaliQuakeApp: App {
     @State var isDebug = true
     let rows = 24
     let cols = 80
+    @State var curChar = AnsiChar(x: 0, y: 0)
     
     var body: some Scene {
         WindowGroup {
             ZStack {
-                MetalView(textBinding: $text, font: font, debug: $isDebug, rows: self.rows, cols: self.cols)
+                MetalView(textBinding: $text, curChar: $curChar, font: font, debug: $isDebug, rows: self.rows, cols: self.cols)
                     .frame(width: (7 * CGFloat(self.cols) ), height: (14 * CGFloat(self.rows)))
                     .padding(5)
                     .background(Color.black)
@@ -185,7 +186,7 @@ struct CaliQuakeApp: App {
     // using all of prev char could be useful
     func parse(_ stdout: Data, prev: AnsiChar?) -> [AnsiChar] {
         //y: (text.last?.y ?? 0), x: (text.last?.x ?? 0)
-        var curChar = prev ?? AnsiChar(x: 0, y: 0)
+        //prev ?? AnsiChar(x: 0, y: 0)
         var isEsc = false
         var isMeta = false
         var parsed: [AnsiChar] = []
@@ -202,6 +203,11 @@ struct CaliQuakeApp: App {
         var i = 0
         while i < stdout.count {
             if stdout[i] == esc {
+                // reset sequence, just in case
+                if !sequence.isEmpty {
+                    print("leftover sequence:", sequence)
+                    sequence.removeAll()
+                }
                 isEsc = true
                 // good enough, until i do real parsing on whole thing
                 // esc [ 6 9 7 ;
@@ -285,7 +291,7 @@ struct CaliQuakeApp: App {
                     row += 1
                     curChar.width = 0
                 } else if stdout[i] == 0x8 /* BS */ {
-                    curChar.width = -curChar.width
+                    col -= curChar.width
                 } else {
                     curChar.width = 1
                 }
@@ -315,7 +321,27 @@ struct CaliQuakeApp: App {
                 osc = false
                 sequence.removeAll()
             }
-            if isEsc && !isMeta && csi && (stdout[i] == 109 /* m */ || stdout[i] == 104 /* h */) {
+            
+            /// cursor movement
+            if isEsc && !isMeta && csi && (stdout[i] >= 65 /* A */ && stdout[i] <= 71 /* G */ ) {
+                switch sequence.removeLast() {
+                case 68: /* D */
+                    if let d = Int(String(data: sequence, encoding: .utf8) ?? "0") {
+                        curChar.x -= d
+                        // clip it
+//                        curChar.x = max(curChar.x, 0)
+                    }
+                case 67: /* C */
+                    if let d = Int(String(data: sequence, encoding: .utf8) ?? "0") {
+                        curChar.x += d
+                        // clip it
+//                        curChar.x = min(curChar.x, self.rows)
+                    }
+                default:
+                    print("shrug", Unicode.Scalar(stdout[i]))
+                }
+                sequence.removeAll()
+            } else if isEsc && !isMeta && csi && (stdout[i] == 109 /* m */ || stdout[i] == 104 /* h */) {
                 // parse sequence now
                 if sequence.removeLast() == 109 {
                     let numbers = sequence.split(separator: 59 /* ; */)
@@ -384,6 +410,7 @@ struct CaliQuakeApp: App {
             i+=1
         }
         
+        print(curChar.x)
         return parsed
     }
 }

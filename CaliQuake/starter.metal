@@ -82,12 +82,12 @@ fragment half4 fragmentShader(VertexOut in [[ stage_in ]],
     // worst: 0.1*1 + 0.0*1 + 0.0*1 = 0.1
     // blur.r > 0.1 || blur.g > 0.1 || blur.b > 0.1 ? 1.0 : 0.0
     half alpha = dot(blur, 1.0) > thresh;
-    half4 bloomedCursor = cursorBase + half4(blur, alpha);
+//    half4 bloomedCursor = cursorBase + half4(blur, alpha);
     
     // Apply the time-based effect
     // simple yet clever :)
     // have to use sin
-    half4 finalCursorColor = bloomedCursor;
+    half4 finalCursorColor = cursorBase;
     half brightness = sin(speed);
     finalCursorColor.rgb = max(finalCursorColor.rgb * brightness, 0);
     

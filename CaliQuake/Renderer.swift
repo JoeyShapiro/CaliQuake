@@ -13,6 +13,7 @@ class Renderer: NSObject {
     var commandQueue: MTLCommandQueue!
     var vertexBuffer: MTLBuffer!
     private var text: [AnsiChar]
+    private var curChar: AnsiChar
     private var texture: MTLTexture?
     private var textureCursor: MTLTexture?
     private var isDirty = true
@@ -40,6 +41,7 @@ class Renderer: NSObject {
     
         self.texture = nil
         self.text = []
+        self.curChar = AnsiChar(x: 0, y: 0)
         
         self.font = font
         self.debug = debug
@@ -55,8 +57,9 @@ class Renderer: NSObject {
         // Handle size change if necessary
     }
     
-    func update(text: [AnsiChar], debug: Bool) {
+    func update(text: [AnsiChar], curChar: AnsiChar, debug: Bool) {
         self.text = text
+        self.curChar = curChar
         self.debug = debug
         self.isDirty = true
     }
@@ -232,9 +235,7 @@ class Renderer: NSObject {
         NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
         
         // TODO test
-        let last_x = self.text.last?.x ?? 0
-        let last_y = self.text.last?.y ?? 0
-        let pos = CGPoint(x: (CGFloat(last_x+1) * 7), y: CGFloat(size.height-14)-(CGFloat(last_y) * 14))
+        let pos = CGPoint(x: (CGFloat(curChar.x+1) * 7), y: CGFloat(size.height-14)-(CGFloat(curChar.y) * 14))
         let rect = CGRect(origin: pos, size: CGSize(width: 7, height: 14))
         context.setFillColor(NSColor.white.cgColor)
         context.fill(rect)
