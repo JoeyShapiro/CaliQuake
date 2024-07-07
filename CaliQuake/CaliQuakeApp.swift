@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import AVFoundation
 
 @main
 struct CaliQuakeApp: App {
@@ -71,7 +72,7 @@ struct CaliQuakeApp: App {
                         if keyPress.characters == "\r" || keyPress.characters == "\n" {
                             command += "\n"
                             // best i can think of
-                            text += parse("\n".data(using: .utf8)!, prev: text.last)
+//                            text += parse("\n".data(using: .utf8)!, prev: text.last)
                             //                        text += keyPress.characters
                         } else if keyPress.characters == "\u{7f}" { // backspace
                             //                        command.removeLast()
@@ -199,6 +200,7 @@ struct CaliQuakeApp: App {
         var keypadMode = ""
         var csi = false // [
         var osc = false // ]
+        var privates: [Int: Bool] = [:]
         
         var i = 0
         while i < stdout.count {
@@ -296,6 +298,8 @@ struct CaliQuakeApp: App {
                     curChar.width = 0
                 } else if stdout[i] == bel {
                     curChar.width = 0
+//                    NSSound(named: "Beep")!.play()
+                    NSSound.beep()
                 } else {
                     curChar.width = 1
                 }
@@ -409,6 +413,28 @@ struct CaliQuakeApp: App {
                         }
                     }
                 }
+                isEsc = false
+                csi = false
+                sequence.removeAll()
+            } else if isEsc && !isMeta && csi && stdout[i] == 63 /* ? */ {
+                i += 1 // "?"
+                var number = Data()
+                // get the number
+                while stdout[i] >= 48 && stdout[i] <= 57 {
+                    number.append(stdout[i])
+                    i += 1
+                }
+                // read what is there
+                if let n = Int(String(data: number, encoding: .utf8)!) {
+                    switch stdout[i] {
+                    case 108: /* l */
+                        // reset or disable
+                        privates.removeValue(forKey: n)
+                    default:
+                        print("unknown code:", Unicode.Scalar(stdout[i]), n)
+                    }
+                }
+                
                 isEsc = false
                 csi = false
                 sequence.removeAll()
