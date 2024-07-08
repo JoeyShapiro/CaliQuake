@@ -23,6 +23,8 @@ class Renderer: NSObject {
     let height: CGFloat
     var mtime: Float = 0.0
     var lastUpdateTime: TimeInterval = Date().timeIntervalSince1970
+    let rows: Int
+    let cols: Int
 
     init(device: MTLDevice, font: NSFont, debug: Bool, cols: Int, rows: Int) {
         self.device = device
@@ -49,6 +51,9 @@ class Renderer: NSObject {
         // all of these numbers must match
         self.width = 7 * CGFloat(cols)
         self.height = 14 * CGFloat(rows)
+        
+        self.rows = rows
+        self.cols = cols
 
         super.init()
     }
@@ -188,7 +193,17 @@ class Renderer: NSObject {
             .backgroundColor: NSColor.clear,
         ]
         
+        // get the row that should be at the top of the screen
+        let lastRow = text.last?.y ?? 0
+        // yes
+        let topRow = lastRow > self.rows-1 ? lastRow-self.rows+1 : 0
+        
         for ac in text {
+            // isVisible is prolly the best way. then i can handle scrolling
+            if ac.y < topRow {
+                continue
+            }
+            
             if ac.invert {
                 attributes[.foregroundColor] = ac.bg == NSColor.clear ? NSColor.black : ac.bg
                 attributes[.backgroundColor] = ac.fg
@@ -199,7 +214,8 @@ class Renderer: NSObject {
             
             attributes[.font] = ac.font.font(size: self.font.pointSize)
             
-            let pos = CGPoint(x: (CGFloat(ac.x) * 7), y: CGFloat(size.height-14)-(CGFloat(ac.y) * 14))
+            let y = CGFloat(size.height-14)-(CGFloat(ac.y-topRow) * 14)
+            let pos = CGPoint(x: (CGFloat(ac.x) * 7), y: y)
             let rect = CGRect(origin: pos, size: CGSize(width: (7 * CGFloat(ac.width)), height: 14))
             String(ac.char).draw(in: rect, withAttributes: attributes)
             
@@ -234,8 +250,14 @@ class Renderer: NSObject {
         NSGraphicsContext.saveGraphicsState()
         NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
         
+        // get the row that should be at the top of the screen
+        let lastRow = text.last?.y ?? 0
+        // yes
+        let topRow = lastRow > self.rows-1 ? lastRow-self.rows+1 : 0
+        let y = CGFloat(size.height-14)-(CGFloat(curChar.y-topRow) * 14)
+        
         // TODO test
-        let pos = CGPoint(x: (CGFloat(curChar.x) * 7), y: CGFloat(size.height-14)-(CGFloat(curChar.y) * 14))
+        let pos = CGPoint(x: (CGFloat(curChar.x) * 7), y: y)
         let rect = CGRect(origin: pos, size: CGSize(width: 7, height: 14))
         context.setFillColor(NSColor.white.cgColor)
         context.fill(rect)

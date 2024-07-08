@@ -45,11 +45,17 @@ struct PopView: View {
                             popPos = value.location
 #if DEBUG
                             if debug {
+                                // get the row that should be at the top of the screen
+                                let lastRow = text.last?.y ?? 0
+                                // yes
+                                let topRow = lastRow > self.rows-1 ? lastRow-self.rows+1 : 0
+                                
                                 // TODO kinda want on drage and stuff, but that may lead back to start
                                 let x = Int(popPos.x / 7)
                                 let y = Int(popPos.y / 14)
-                                if let ac = self.text.first(where: { ac in
-                                    return ac.x == x && ac.y == y
+                                // last is better, it will show what is on top. but it should show all
+                                if let ac = self.text.last(where: { ac in
+                                    return ac.x == x && ac.y-topRow == y
                                 }) {
                                     popAC = ac
                                     visible = true
