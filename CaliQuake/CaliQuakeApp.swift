@@ -172,11 +172,24 @@ struct CaliQuakeApp: App {
     }
     
     func format(_ text: [AnsiChar]) -> [AnsiChar] {
+        var posistions: [Int: [Int: Bool]] = [:]
         var formatted: [AnsiChar] = []
         for ac in text {
             if ac.char.asciiValue == 0x8 /* BS */ {
-                let _ = formatted.popLast()
+                if let last = formatted.popLast() {
+                    posistions[last.y]?[last.x] = nil
+                }
             } else {
+                // seems super slow
+                if posistions[ac.y]?[ac.x] ?? false {
+                    formatted.removeAll(where: { $0.x == ac.x && $0.y == ac.y })
+                }
+                
+                if posistions[ac.y] == nil {
+                    posistions[ac.y] = [:]
+                }
+                posistions[ac.y]?[ac.x] = true
+                
                 formatted.append(ac)
             }
         }
