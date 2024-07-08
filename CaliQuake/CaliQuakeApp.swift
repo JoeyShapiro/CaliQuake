@@ -280,11 +280,12 @@ struct CaliQuakeApp: App {
                 
                 // do action after placing it
                 if stdout[i] == 0xd /* \r */ {
+                    // this is what is happening. you just dont see it
                     col = 0
-                    row += 1
                     
                     // ¯\_(ツ)_/¯
                     if i+1 < stdout.count && stdout[i+1] == 0xa /* \n */ {
+                        row += 1
                         i += 1
                     }
                     curChar.width = 0
@@ -430,6 +431,8 @@ struct CaliQuakeApp: App {
                     case 108: /* l */
                         // reset or disable
                         privates.removeValue(forKey: n)
+                    case 104: /* h */
+                        privates[n] = true
                     default:
                         print("unknown code:", Unicode.Scalar(stdout[i]), n)
                     }
