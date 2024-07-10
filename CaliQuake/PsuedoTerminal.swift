@@ -169,18 +169,20 @@ class PseudoTerminal {
                 if bytesRead > 0 {
                     data.append(buffer, count: bytesRead)
                     #if DEBUG
-                    if let output = String(data: data, encoding: .utf8) {
-                            print("\"", terminator: "")
-                            for c in output {
-                                let val = c.unicodeScalars.first?.value ?? 0
-                                // is printable ascii character
-                                if let ascii = c.asciiValue, ascii > 32 && ascii < 127 {
-                                    print(c, terminator: "")
-                                } else {
-                                    print("\\u(\(val))", terminator: "")
-                                }
-                            }
-                            print("\"")
+                        if let output = String(data: data, encoding: .utf8) {
+                            print(output.debugDescription)
+//                            print("\"", terminator: "")
+//                            // this does not print \n "\u{1b}[?2004l\r\r\n"
+//                            for c in output {
+//                                let val = c.unicodeScalars.first?.value ?? 0
+//                                // is printable ascii character
+//                                if let ascii = c.asciiValue, ascii > 32 && ascii < 127 {
+//                                    print(c, terminator: "")
+//                                } else {
+//                                    print("\\u(\(val))", terminator: "")
+//                                }
+//                            }
+//                            print("\"")
                         } else {
                             print("Error decoding output data")
                         }

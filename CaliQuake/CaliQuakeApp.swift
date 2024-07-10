@@ -64,6 +64,22 @@ struct CaliQuakeApp: App {
                         Phase: \(keyPress.phase)
                         Debug description: \(keyPress.debugDescription)
                     """)
+                        /*
+                         16 - command (meta)
+                         8  - option
+                         4  - control
+                         2  - shift
+                         1  - caps lock (enabled)
+                         */
+                        if keyPress.modifiers.contains(.control) && keyPress.characters == "l" {
+                            // ?
+                            text.removeAll()
+                            curChar = AnsiChar(x: 0, y: 0)
+                            command += "\n"
+                            let _ = pty!.write(command: command)
+                            command = ""
+                            return .handled
+                        }
                         if keyPress.modifiers.rawValue == 16 && keyPress.characters == "i" {
                             isDebug.toggle()
                             return .handled
@@ -181,7 +197,7 @@ struct CaliQuakeApp: App {
                 }
             } else {
                 // seems super slow
-                if posistions[ac.y]?[ac.x] ?? false {
+                if ac.width > 0 && posistions[ac.y]?[ac.x] ?? false {
                     formatted.removeAll(where: { $0.x == ac.x && $0.y == ac.y })
                 }
                 
@@ -421,6 +437,8 @@ struct CaliQuakeApp: App {
                                 curChar.bg = .white
                             case 49:
                                 curChar.bg = .clear
+                            case 90: // "bright" black
+                                curChar.fg = .systemGray // should really just be gray
                             default:
                                 curChar.fg = .debugMagenta
                             }
