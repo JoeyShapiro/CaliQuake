@@ -278,6 +278,15 @@ struct CaliQuakeApp: App {
                     continue
                 }
                 
+                if csi && stdout[i] == 72 /* H */ {
+                    curChar = AnsiChar(x: 0, y: 0)
+                    
+                    isEsc = false
+                    csi = false
+                    i += 1
+                    continue
+                }
+                
                 if i+3 < stdout.count {
                     isMeta = stdout[i+1] == 54 /* 6 */ && stdout[i+2] == 57 /* 9 */ && stdout[i+3] == 55 /* 7 */
                 }
@@ -472,6 +481,18 @@ struct CaliQuakeApp: App {
                 isEsc = false
                 csi = false
                 sequence.removeAll()
+            } else if isEsc && !isMeta && csi && stdout[i] == 74 /* J */ {
+                sequence.removeLast()
+                if let n = Int(String(data: sequence, encoding: .utf8)!){
+                    switch n {
+                    case 3: // clear scroll back
+                        print("TODO")
+                    case 2: // clear screen
+                        text = []
+                    default: // 0
+                        print("default J")
+                    }
+                }
             }
             
             i+=1
