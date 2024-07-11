@@ -8,10 +8,11 @@ struct Vertex {
 }
 
 class Renderer: NSObject {
-    var device: MTLDevice!
+    var device: MTLDevice
     var pipelineState: MTLRenderPipelineState!
     var commandQueue: MTLCommandQueue!
     var vertexBuffer: MTLBuffer!
+    var texCoordBuffer: MTLBuffer!
     private var text: [AnsiChar]
     private var curChar: AnsiChar
     private var texture: MTLTexture?
@@ -25,6 +26,8 @@ class Renderer: NSObject {
     var lastUpdateTime: TimeInterval = Date().timeIntervalSince1970
     let rows: Int
     let cols: Int
+    let fps: Double
+    var times = [TimeInterval]()
 
     init(device: MTLDevice, font: NSFont, debug: Bool, cols: Int, rows: Int) {
         self.device = device
@@ -54,6 +57,24 @@ class Renderer: NSObject {
         
         self.rows = rows
         self.cols = cols
+        
+        let vertices: [Float] = [
+            -1.0, -1.0,
+             1.0, -1.0,
+             -1.0,  1.0,
+             1.0,  1.0
+        ]
+        self.vertexBuffer = device.makeBuffer(bytes: vertices, length: vertices.count * MemoryLayout<Float>.size, options: [])
+        
+        let texCoords: [Float] = [
+            0.0, 1.0,
+            1.0, 1.0,
+            0.0, 0.0,
+            1.0, 0.0
+        ]
+        self.texCoordBuffer = device.makeBuffer(bytes: texCoords, length: texCoords.count * MemoryLayout<Float>.size, options: [])
+        
+        self.fps = 60
 
         super.init()
     }
@@ -95,21 +116,28 @@ class Renderer: NSObject {
             return
         }
         
-        guard let commandBuffer = view.device?.makeCommandQueue()?.makeCommandBuffer(),
-              let descriptor = view.currentRenderPassDescriptor,
-              let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor) else {
-            return
-        }
-        
         let currentTime = Date().timeIntervalSince1970
         let deltaTime = currentTime - lastUpdateTime
         self.mtime += Float(deltaTime * 1000) // Convert to milliseconds
+        
+//        if deltaTime < 1.0/30.0 {
+//            return
+//        }
+        
+        // dont recreate the command queue every time
+        guard let commandBuffer = self.commandQueue.makeCommandBuffer(),
+              let descriptor = view.currentRenderPassDescriptor,
+              let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor),
+              let drawable = view.currentDrawable else {
+            return
+        }
+        
         lastUpdateTime = currentTime
         
         // Prevent timeInMilliseconds from growing too large
         self.mtime = fmodf(self.mtime, 1000000) // Reset every million milliseconds
         
-        encoder.setRenderPipelineState(pipelineState!)
+        encoder.setRenderPipelineState(self.pipelineState!)
         var resolution = vector_float2(Float(view.drawableSize.width), Float(view.drawableSize.height))
         encoder.setFragmentBytes(&resolution, length: MemoryLayout<vector_float2>.size, index: 0)
         encoder.setFragmentTexture(texture, index: 0)
@@ -117,30 +145,13 @@ class Renderer: NSObject {
         // Pass time to the shader
         encoder.setFragmentBytes(&self.mtime, length: MemoryLayout<Float>.size, index: 1);
         
-        let vertices: [Float] = [
-            -1.0, -1.0,
-             1.0, -1.0,
-             -1.0,  1.0,
-             1.0,  1.0
-        ]
-        let vertexBuffer = view.device?.makeBuffer(bytes: vertices, length: vertices.count * MemoryLayout<Float>.size, options: [])
-        encoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
+        encoder.setVertexBuffer(self.vertexBuffer, offset: 0, index: 0)
         
-        let texCoords: [Float] = [
-            0.0, 1.0,
-            1.0, 1.0,
-            0.0, 0.0,
-            1.0, 0.0
-        ]
-        let texCoordBuffer = view.device?.makeBuffer(bytes: texCoords, length: texCoords.count * MemoryLayout<Float>.size, options: [])
-        encoder.setVertexBuffer(texCoordBuffer, offset: 0, index: 1)
+        encoder.setVertexBuffer(self.texCoordBuffer, offset: 0, index: 1)
         
         encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
         encoder.endEncoding()
-        
-        guard let drawable = view.currentDrawable else {
-            return
-        }
+
         commandBuffer.present(drawable)
         commandBuffer.commit()
     }
