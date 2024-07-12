@@ -28,6 +28,7 @@ class Renderer: NSObject {
     let cols: Int
     let fps: Double
     var times = [TimeInterval]()
+    var resolution: simd_float2
 
     init(device: MTLDevice, font: NSFont, debug: Bool, cols: Int, rows: Int) {
         self.device = device
@@ -75,12 +76,14 @@ class Renderer: NSObject {
         self.texCoordBuffer = device.makeBuffer(bytes: texCoords, length: texCoords.count * MemoryLayout<Float>.size, options: [])
         
         self.fps = 60
+        self.resolution = vector_float2()
 
         super.init()
     }
 
     func drawableSizeWillChange(size: CGSize) {
         // Handle size change if necessary
+        self.resolution = vector_float2(Float(size.width), Float(size.height))
     }
     
     func update(text: [AnsiChar], curChar: AnsiChar, debug: Bool) {
@@ -112,20 +115,17 @@ class Renderer: NSObject {
             isDirty = false
         }
         
-        guard let texture = self.texture else {
-            return
-        }
-        
         let currentTime = Date().timeIntervalSince1970
         let deltaTime = currentTime - lastUpdateTime
         self.mtime += Float(deltaTime * 1000) // Convert to milliseconds
         
-//        if deltaTime < 1.0/30.0 {
-//            return
-//        }
+        if deltaTime < 1.0/30.0 {
+            return
+        }
         
         // dont recreate the command queue every time
-        guard let commandBuffer = self.commandQueue.makeCommandBuffer(),
+        guard let texture = self.texture,
+              let commandBuffer = self.commandQueue.makeCommandBuffer(),
               let descriptor = view.currentRenderPassDescriptor,
               let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor),
               let drawable = view.currentDrawable else {
@@ -138,15 +138,12 @@ class Renderer: NSObject {
         self.mtime = fmodf(self.mtime, 1000000) // Reset every million milliseconds
         
         encoder.setRenderPipelineState(self.pipelineState!)
-        var resolution = vector_float2(Float(view.drawableSize.width), Float(view.drawableSize.height))
-        encoder.setFragmentBytes(&resolution, length: MemoryLayout<vector_float2>.size, index: 0)
         encoder.setFragmentTexture(texture, index: 0)
         encoder.setFragmentTexture(self.textureCursor, index: 1)
-        // Pass time to the shader
-        encoder.setFragmentBytes(&self.mtime, length: MemoryLayout<Float>.size, index: 1);
+        encoder.setFragmentBytes(&self.resolution, length: MemoryLayout<vector_float2>.size, index: 0)
+        encoder.setFragmentBytes(&self.mtime, length: MemoryLayout<Float>.size, index: 1)
         
         encoder.setVertexBuffer(self.vertexBuffer, offset: 0, index: 0)
-        
         encoder.setVertexBuffer(self.texCoordBuffer, offset: 0, index: 1)
         
         encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)

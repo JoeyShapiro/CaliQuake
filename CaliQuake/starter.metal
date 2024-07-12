@@ -26,6 +26,15 @@ half3 sampleTexture(texture2d<half> tex, float2 uv, sampler texSampler) {
     return half3(tex.sample(texSampler, uv).rgb);
 }
 
+//fragment half4 fragmentShader(VertexOut in [[ stage_in ]],
+//                              texture2d<half> tex [[ texture(0) ]],
+//                              texture2d<half> cursor [[ texture(1) ]],
+//                              constant float2& resolution [[buffer(0)]],
+//                              constant float &mtime [[ buffer(1) ]]) {
+//    constexpr sampler texSampler(mag_filter::linear, min_filter::linear);
+//    return tex.sample(texSampler, in.texCoord);
+//}
+
 /*
  Options:
  - Using Metal's built-in multisampling render targets
