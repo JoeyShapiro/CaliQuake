@@ -13,7 +13,3 @@ struct CaliMenuExtra: View {
         Text("")
     }
 }
-
-#Preview {
-    CaliMenuExtra()
-}
