@@ -53,6 +53,7 @@ struct MetalView: NSViewRepresentable {
         mtkView.device = MTLCreateSystemDefaultDevice()
         mtkView.delegate = context.coordinator
         mtkView.colorPixelFormat = .bgra8Unorm
+        mtkView.preferredFramesPerSecond = 30
         return mtkView
     }
 

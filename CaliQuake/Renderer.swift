@@ -26,7 +26,6 @@ class Renderer: NSObject {
     var lastUpdateTime: TimeInterval = Date().timeIntervalSince1970
     let rows: Int
     let cols: Int
-    let fps: Double
     var times = [TimeInterval]()
     var resolution: simd_float2
 
@@ -75,7 +74,6 @@ class Renderer: NSObject {
         ]
         self.texCoordBuffer = device.makeBuffer(bytes: texCoords, length: texCoords.count * MemoryLayout<Float>.size, options: [])
         
-        self.fps = 60
         self.resolution = vector_float2()
 
         super.init()
@@ -118,10 +116,6 @@ class Renderer: NSObject {
         let currentTime = Date().timeIntervalSince1970
         let deltaTime = currentTime - lastUpdateTime
         self.mtime += Float(deltaTime * 1000) // Convert to milliseconds
-        
-        if deltaTime < 1.0/30.0 {
-            return
-        }
         
         // dont recreate the command queue every time
         guard let texture = self.texture,
