@@ -46,6 +46,8 @@ struct CaliQuakeApp: App {
     let height: CGFloat
     let fontWidth: CGFloat
     let fontHeight: CGFloat
+    @State private var effect = 0
+    @State private var isFavorite = false
     
     init() {
         self.fontWidth = 7
@@ -58,6 +60,13 @@ struct CaliQuakeApp: App {
     
     var body: some Scene {
         WindowGroup {
+            Button {
+                isFavorite.toggle()
+            } label: {
+                Label("Activate Inbox Zero", systemImage: "mail.stack")
+            }
+            .symbolEffect(.bounce, options: .speed(3).repeat(3), value: isFavorite)
+            .font(.largeTitle)
             ZStack {
                 MetalView(grid: $grid, pointSize: self.font.pointSize, debug: $isDebug, rows: self.rows, cols: self.cols)
                     .frame(width: (7 * CGFloat(self.cols) ), height: (14 * CGFloat(self.rows)))
@@ -77,10 +86,14 @@ struct CaliQuakeApp: App {
             }
         }
         .modelContainer(sharedModelContainer)
-        MenuBarExtra(
-                    "App Menu Bar Extra", systemImage: "water.waves"
-                    )
-                {
+        MenuBarExtra {
+            Button {
+                isFavorite.toggle()
+            } label: {
+                Label("Activate Inbox Zero", systemImage: "mail.stack")
+            }
+            .symbolEffect(.bounce, options: .speed(3).repeat(3), value: isFavorite)
+            .font(.largeTitle)
                     CaliMenuExtra(grid: $grid)
                         .frame(width: (7 * CGFloat(self.cols) ), height: (14 * CGFloat(self.rows)))
                         .padding(5)
@@ -149,7 +162,10 @@ struct CaliQuakeApp: App {
                             
                             return .handled
                         })
-                }.menuBarExtraStyle(.window)
+        } label: {
+            Image(systemName: "water.waves")
+                .symbolEffect(.bounce.up.byLayer, value: effect)
+        }.menuBarExtraStyle(.window)
     }
     
     func startTTY() {
@@ -193,6 +209,7 @@ struct CaliQuakeApp: App {
             
             do {
                 (data, n) = try await pty!.read()
+                effect += n
             } catch {
                 
             }
