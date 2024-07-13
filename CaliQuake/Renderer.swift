@@ -13,8 +13,7 @@ class Renderer: NSObject {
     var commandQueue: MTLCommandQueue!
     var vertexBuffer: MTLBuffer!
     var texCoordBuffer: MTLBuffer!
-    private var text: [AnsiChar]
-    private var curChar: AnsiChar
+    private var grid: TerminalGrid
     private var texture: MTLTexture?
     private var textureCursor: MTLTexture?
     private var isDirty = true
@@ -45,8 +44,7 @@ class Renderer: NSObject {
         self.pipelineState = try! device.makeRenderPipelineState(descriptor: pipelineDescriptor)
     
         self.texture = nil
-        self.text = []
-        self.curChar = AnsiChar(x: 0, y: 0)
+        self.grid = TerminalGrid(cols: 0, rows: 0)
         
         self.font = font
         self.debug = debug
@@ -84,9 +82,8 @@ class Renderer: NSObject {
         self.resolution = vector_float2(Float(size.width), Float(size.height))
     }
     
-    func update(text: [AnsiChar], curChar: AnsiChar, debug: Bool) {
-        self.text = text
-        self.curChar = curChar
+    func update(grid: TerminalGrid, debug: Bool) {
+        self.grid = grid
         self.debug = debug
         self.isDirty = true
     }
@@ -98,7 +95,7 @@ class Renderer: NSObject {
 //                fatalError("cannot find font")
 //            }
             let size = CGSize(width: self.width, height: self.height)
-            let imageData = convertCGImageToData(makeImage(text: self.text, font: self.font, size: size)!)!
+            let imageData = convertCGImageToData(makeImage(grid: self.grid, font: self.font, size: size)!)!
             let imageCursor = convertCGImageToData(makeCursor(size: size)!)!
             
             let textureLoader = MTKTextureLoader(device: view.device!)
@@ -165,7 +162,7 @@ class Renderer: NSObject {
         return data as Data
     }
     
-    private func makeImage(text: [AnsiChar], font: NSFont, size: CGSize) -> CGImage? {
+    func makeImage(grid: TerminalGrid, font: NSFont, size: CGSize) -> CGImage? {
         // Create a bitmap context
         let scale = NSScreen.main?.backingScaleFactor ?? 1.0
         let width = Int(size.width * scale)
@@ -195,14 +192,9 @@ class Renderer: NSObject {
             .backgroundColor: NSColor.clear,
         ]
         
-        // get the row that should be at the top of the screen
-        let lastRow = text.last?.y ?? 0
-        // yes
-        let topRow = lastRow > self.rows-1 ? lastRow-self.rows+1 : 0
-        
-        for ac in text {
+        for ac in self.grid {
             // isVisible is prolly the best way. then i can handle scrolling
-            if ac.y < topRow {
+            if ac.y < self.grid.top {
                 continue
             }
             
@@ -216,7 +208,7 @@ class Renderer: NSObject {
             
             attributes[.font] = ac.font.font(size: self.font.pointSize)
             
-            let y = CGFloat(size.height-14)-(CGFloat(ac.y-topRow) * 14)
+            let y = CGFloat(size.height-14)-(CGFloat(ac.y-self.grid.top) * 14)
             let pos = CGPoint(x: (CGFloat(ac.x) * 7), y: y)
             let rect = CGRect(origin: pos, size: CGSize(width: (7 * CGFloat(ac.width)), height: 14))
             String(ac.char).draw(in: rect, withAttributes: attributes)
@@ -252,14 +244,10 @@ class Renderer: NSObject {
         NSGraphicsContext.saveGraphicsState()
         NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
         
-        // get the row that should be at the top of the screen
-        let lastRow = text.last?.y ?? 0
-        // yes
-        let topRow = lastRow > self.rows-1 ? lastRow-self.rows+1 : 0
-        let y = CGFloat(size.height-14)-(CGFloat(curChar.y-topRow) * 14)
+        let y = CGFloat(size.height-14)-(CGFloat(self.grid.cury()-self.grid.top) * 14)
         
         // TODO test
-        let pos = CGPoint(x: (CGFloat(curChar.x) * 7), y: y)
+        let pos = CGPoint(x: (CGFloat(self.grid.curx()) * 7), y: y)
         let rect = CGRect(origin: pos, size: CGSize(width: 7, height: 14))
         context.setFillColor(NSColor.white.cgColor)
         context.fill(rect)
