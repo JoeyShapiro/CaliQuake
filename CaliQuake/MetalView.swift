@@ -17,7 +17,7 @@ struct MetalView: NSViewRepresentable {
         var renderer: Renderer
         
         init(device: MTLDevice, pointSize: CGFloat, debug: Bool, rows: Int, cols: Int) {
-            self.renderer = Renderer(device: device, pointSize: pointSize, debug: debug, cols: cols, rows: rows)
+            self.renderer = Renderer(device: device, pointSize: pointSize, cols: cols, rows: rows)
         }
         
         func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
@@ -30,7 +30,7 @@ struct MetalView: NSViewRepresentable {
         
         func update(grid: TerminalGrid, debug: Bool) {
             // good idea to add debug, they both need to be updated together anyway
-            renderer.update(grid: grid, debug: debug)
+            renderer.update(grid: grid)
         }
     }
     

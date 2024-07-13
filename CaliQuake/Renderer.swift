@@ -17,7 +17,6 @@ class Renderer: NSObject {
     private var texture: MTLTexture?
     private var textureCursor: MTLTexture?
     private var isDirty = true
-    private var debug: Bool
     let width: CGFloat
     let height: CGFloat
     var mtime: Float = 0.0
@@ -28,7 +27,7 @@ class Renderer: NSObject {
     var times = [TimeInterval]()
     var resolution: simd_float2
 
-    init(device: MTLDevice, pointSize: CGFloat, debug: Bool, cols: Int, rows: Int) {
+    init(device: MTLDevice, pointSize: CGFloat, cols: Int, rows: Int) {
         self.device = device
         self.commandQueue = device.makeCommandQueue()
 
@@ -46,7 +45,6 @@ class Renderer: NSObject {
         self.texture = nil
         self.grid = TerminalGrid(cols: 0, rows: 0)
         self.pointSize = pointSize
-        self.debug = debug
         
         // all of these numbers must match
         self.width = 7 * CGFloat(cols)
@@ -81,9 +79,8 @@ class Renderer: NSObject {
         self.resolution = vector_float2(Float(size.width), Float(size.height))
     }
     
-    func update(grid: TerminalGrid, debug: Bool) {
+    func update(grid: TerminalGrid) {
         self.grid = grid
-        self.debug = debug
         self.isDirty = true
     }
 

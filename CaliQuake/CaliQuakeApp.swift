@@ -64,70 +64,6 @@ struct CaliQuakeApp: App {
                     .padding(5)
                     .background(Color.black)
 //                    .frame(width: (font.pointSize * CGFloat(self.cols) / fontRatio ), height: (font.pointSize * fontHuh * CGFloat(self.rows)))
-                    .focusable()
-                    .focused($focused)
-                    .focusEffectDisabled()
-                    .onKeyPress(action: { keyPress in
-                        print("""
-                        New key event:
-                        Key: \(keyPress.characters)
-                        Modifiers: \(keyPress.modifiers)
-                        Phase: \(keyPress.phase)
-                        Debug description: \(keyPress.debugDescription)
-                    """)
-                        /*
-                         16 - command (meta)
-                         8  - option
-                         4  - control
-                         2  - shift
-                         1  - caps lock (enabled)
-                         */
-                        if keyPress.modifiers.contains(.control) && keyPress.characters == "l" {
-                            // ?
-                            grid.clear()
-                            command += "\n"
-                            let _ = pty!.write(command: command)
-                            command = ""
-                            return .handled
-                        }
-                        if keyPress.modifiers.rawValue == 16 && keyPress.characters == "i" {
-                            isDebug.toggle()
-                            return .handled
-                        }
-                        
-                        if keyPress.characters == "\r" || keyPress.characters == "\n" {
-                            command += "\n"
-                            // best i can think of
-//                            text += parse("\n".data(using: .utf8)!, prev: text.last)
-                            //                        text += keyPress.characters
-                        } else if keyPress.characters == "\u{7f}" { // backspace
-                            //                        command.removeLast()
-                            command += keyPress.characters
-                            //                        text.removeLast()
-                        } else {
-                            command += keyPress.characters
-                            //                        text += keyPress.characters // the keys are duping or somthing
-                        }
-                        
-                        // i think this makes more sense
-                        // i know when to write
-                        // unless its something special, but i can still handle that
-                        if !command.isEmpty {
-                            let n = pty!.write(command: command)
-                            command = ""
-                            print("wrote \(n)")
-                        }
-                        
-                        // escape codes
-                        //
-                        // name
-                        // ps info
-                        // rows
-                        // maybe do that somewhere else, but i kinda need it
-                        // either pass in the info, or use modifiers
-                        
-                        return .handled
-                    })
                     .onAppear() {
                         if pty == nil {
                             startTTY()
@@ -145,7 +81,74 @@ struct CaliQuakeApp: App {
                     "App Menu Bar Extra", systemImage: "water.waves"
                     )
                 {
-                    CaliMenuExtra()
+                    CaliMenuExtra(grid: $grid)
+                        .frame(width: (7 * CGFloat(self.cols) ), height: (14 * CGFloat(self.rows)))
+                        .padding(5)
+                        .background(Color.black)
+                        .focusable()
+                        .focused($focused)
+                        .focusEffectDisabled()
+                        .onKeyPress(action: { keyPress in
+                            print("""
+                        New key event:
+                        Key: \(keyPress.characters)
+                        Modifiers: \(keyPress.modifiers)
+                        Phase: \(keyPress.phase)
+                        Debug description: \(keyPress.debugDescription)
+                    """)
+                            /*
+                             16 - command (meta)
+                             8  - option
+                             4  - control
+                             2  - shift
+                             1  - caps lock (enabled)
+                             */
+                            if keyPress.modifiers.contains(.control) && keyPress.characters == "l" {
+                                // ?
+                                grid.clear()
+                                command += "\n"
+                                let _ = pty!.write(command: command)
+                                command = ""
+                                return .handled
+                            }
+                            if keyPress.modifiers.rawValue == 16 && keyPress.characters == "i" {
+                                isDebug.toggle()
+                                return .handled
+                            }
+                            
+                            if keyPress.characters == "\r" || keyPress.characters == "\n" {
+                                command += "\n"
+                                // best i can think of
+                                //                            text += parse("\n".data(using: .utf8)!, prev: text.last)
+                                //                        text += keyPress.characters
+                            } else if keyPress.characters == "\u{7f}" { // backspace
+                                //                        command.removeLast()
+                                command += keyPress.characters
+                                //                        text.removeLast()
+                            } else {
+                                command += keyPress.characters
+                                //                        text += keyPress.characters // the keys are duping or somthing
+                            }
+                            
+                            // i think this makes more sense
+                            // i know when to write
+                            // unless its something special, but i can still handle that
+                            if !command.isEmpty {
+                                let n = pty!.write(command: command)
+                                command = ""
+                                print("wrote \(n)")
+                            }
+                            
+                            // escape codes
+                            //
+                            // name
+                            // ps info
+                            // rows
+                            // maybe do that somewhere else, but i kinda need it
+                            // either pass in the info, or use modifiers
+                            
+                            return .handled
+                        })
                 }.menuBarExtraStyle(.window)
     }
     
