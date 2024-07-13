@@ -113,6 +113,11 @@ struct CaliQuakeApp: App {
                                 let _ = pty!.write(command: command)
                                 command = ""
                                 return .handled
+                            } else if keyPress.modifiers.contains(.control) && keyPress.characters == "c" {
+                                command += String(bytes: [3], encoding: .utf8)! // ctrl-c
+                                let n = pty!.write(command: command)
+                                command = ""
+                                return .handled
                             }
                             if keyPress.modifiers.rawValue == 16 && keyPress.characters == "i" {
                                 isDebug.toggle()

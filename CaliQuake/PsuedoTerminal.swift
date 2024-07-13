@@ -9,8 +9,8 @@ import Foundation
 import Dispatch
 
 class PseudoTerminal {
-//    private var shell = "/usr/bin/login".withCString(strdup) // /opt/homebrew/bin/nu
-    private var shell = "/bin/zsh".withCString(strdup)
+    private var shell = "/usr/bin/login".withCString(strdup) // /opt/homebrew/bin/nu
+//    private var shell = "/bin/zsh".withCString(strdup)
     private var fileActions: posix_spawn_file_actions_t? = nil
     private var spawnAttr: posix_spawnattr_t? = nil
     private var master: Int32 = 0
@@ -109,8 +109,8 @@ class PseudoTerminal {
         print("unblock done")
         
         // Prepare the arguments array
-        let arguments: [String] = []
-//        let arguments = [ "-fp", "oniichan", "/bin/zsh", "-fc", "exec -a -zsh /bin/zsh" ]
+//        let arguments: [String] = []
+        let arguments = [ "-fp", "oniichan", "/bin/zsh", "-fc", "exec -a -zsh /bin/zsh" ]
         let args = [shell] + arguments.map { strdup($0) }
         defer { for arg in args { free(arg) } }
         let env = environment.map({ "\($0)=\($1)" }) 
