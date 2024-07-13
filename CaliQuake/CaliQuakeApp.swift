@@ -110,6 +110,16 @@ struct CaliQuakeApp: App {
                              2  - shift
                              1  - caps lock (enabled)
                              */
+                            if keyPress.modifiers.contains(.command) {
+                                if keyPress.characters == "v" {
+                                    let pasteboard = NSPasteboard.general
+                                    if let string = pasteboard.string(forType: .string) {
+                                        let _ = pty!.write(command: string)
+                                    }
+                                    
+                                    return .handled
+                                }
+                            }
                             if keyPress.modifiers.contains(.control) && keyPress.characters == "l" {
                                 // ?
                                 grid.clear()
