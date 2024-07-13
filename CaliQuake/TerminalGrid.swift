@@ -402,6 +402,36 @@ struct TerminalGrid: Sequence {
         
         return formatted
     }
+    
+    func makeCursor(size: CGSize) -> CGImage? {
+        // Create a bitmap context
+        let scale = NSScreen.main?.backingScaleFactor ?? 1.0
+        let width = Int(size.width * scale)
+        let height = Int(size.height * scale)
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue
+        guard let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 4 * width, space: colorSpace, bitmapInfo: bitmapInfo) else { return nil }
+        
+        context.scaleBy(x: scale, y: scale)
+        
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
+        
+        let y = CGFloat(size.height-14)-(CGFloat(self.cury()-self.top) * 14)
+        
+        // TODO test
+        let pos = CGPoint(x: (CGFloat(self.curx()) * 7), y: y)
+        let rect = CGRect(origin: pos, size: CGSize(width: 7, height: 14))
+        context.setFillColor(NSColor.white.cgColor)
+        context.fill(rect)
+        
+        NSGraphicsContext.restoreGraphicsState()
+        
+        // Create a texture from the bitmap context
+        guard let image = context.makeImage() else { return nil }
+        
+        return image
+    }
 }
 
 enum FontStyle {

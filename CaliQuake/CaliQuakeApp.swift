@@ -59,7 +59,7 @@ struct CaliQuakeApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                MetalView(grid: $grid, font: font, debug: $isDebug, rows: self.rows, cols: self.cols)
+                MetalView(grid: $grid, pointSize: self.font.pointSize, debug: $isDebug, rows: self.rows, cols: self.cols)
                     .frame(width: (7 * CGFloat(self.cols) ), height: (14 * CGFloat(self.rows)))
                     .padding(5)
                     .background(Color.black)

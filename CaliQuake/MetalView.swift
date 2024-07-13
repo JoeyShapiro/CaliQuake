@@ -16,8 +16,8 @@ struct MetalView: NSViewRepresentable {
     class Coordinator: NSObject, MTKViewDelegate {
         var renderer: Renderer
         
-        init(device: MTLDevice, font: NSFont, debug: Bool, rows: Int, cols: Int) {
-            self.renderer = Renderer(device: device, font: font, debug: debug, cols: cols, rows: rows)
+        init(device: MTLDevice, pointSize: CGFloat, debug: Bool, rows: Int, cols: Int) {
+            self.renderer = Renderer(device: device, pointSize: pointSize, debug: debug, cols: cols, rows: rows)
         }
         
         func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
@@ -34,12 +34,12 @@ struct MetalView: NSViewRepresentable {
         }
     }
     
-    init(grid: Binding<TerminalGrid>, font: NSFont, debug: Binding<Bool>, rows: Int, cols: Int) {
+    init(grid: Binding<TerminalGrid>, pointSize: CGFloat, debug: Binding<Bool>, rows: Int, cols: Int) {
         let device = MTLCreateSystemDefaultDevice()!
         self._grid = grid
         self._debug = debug
         
-        self.coordinator = Coordinator(device: device, font: font, debug: false, rows: rows, cols: cols)
+        self.coordinator = Coordinator(device: device, pointSize: pointSize, debug: false, rows: rows, cols: cols)
     }
 
     func makeCoordinator() -> Coordinator {
