@@ -17,6 +17,7 @@ struct TerminalGrid: Sequence {
     private var cols: Int
     private var rows: Int
     public var top: Int
+    private var debug: Bool
     
     init(cols: Int, rows: Int) {
         self.text = []
@@ -25,6 +26,12 @@ struct TerminalGrid: Sequence {
         
         self.cols = cols
         self.rows = rows
+        
+        self.debug = false
+    }
+    
+    mutating func update(debug: Bool) {
+        self.debug = debug
     }
     
     func makeIterator() -> TextIterator {
@@ -401,6 +408,74 @@ struct TerminalGrid: Sequence {
         }
         
         return formatted
+    }
+    
+    func makeImage(size: CGSize, pointSize: CGFloat) -> CGImage? {
+        // Create a bitmap context
+        let scale = NSScreen.main?.backingScaleFactor ?? 1.0
+        let width = Int(size.width * scale)
+        let height = Int(size.height * scale)
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue
+        guard let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 4 * width, space: colorSpace, bitmapInfo: bitmapInfo) else { return nil }
+        
+        context.scaleBy(x: scale, y: scale)
+        //        context.setShouldAntialias(true)
+        //        context.setAllowsAntialiasing(true)
+        //        context.setShouldSmoothFonts(true)
+        //        context.setAllowsFontSmoothing(true)
+        
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
+        
+        // Draw the text
+        let paragraphStyle = NSMutableParagraphStyle()
+        let style: FontStyle = .regular
+        paragraphStyle.alignment = .center
+        paragraphStyle.lineHeightMultiple = 0.9
+        var attributes: [NSAttributedString.Key: Any] = [
+            .font: style.font(size: pointSize),
+            .paragraphStyle: paragraphStyle,
+            .foregroundColor: NSColor.white, // if the data is not the right type, it will crash
+            .backgroundColor: NSColor.clear,
+        ]
+        
+        for ac in self.text {
+            // isVisible is prolly the best way. then i can handle scrolling
+            if ac.y < self.top {
+                continue
+            }
+            
+            if ac.invert {
+                attributes[.foregroundColor] = ac.bg == NSColor.clear ? NSColor.black : ac.bg
+                attributes[.backgroundColor] = ac.fg
+            } else {
+                attributes[.foregroundColor] = ac.fg
+                attributes[.backgroundColor] = ac.bg
+            }
+            
+            attributes[.font] = ac.font.font(size: pointSize)
+            
+            let y = CGFloat(size.height-14)-(CGFloat(ac.y-self.top) * 14)
+            let pos = CGPoint(x: (CGFloat(ac.x) * 7), y: y)
+            let rect = CGRect(origin: pos, size: CGSize(width: (7 * CGFloat(ac.width)), height: 14))
+            String(ac.char).draw(in: rect, withAttributes: attributes)
+            
+#if DEBUG
+            if self.debug {
+                context.setStrokeColor(NSColor.red.cgColor)  // Set border color
+                context.setLineWidth(0.2)  // Set border width
+                context.stroke(rect)
+            }
+#endif
+        }
+        
+        NSGraphicsContext.restoreGraphicsState()
+        
+        // Create a texture from the bitmap context
+        guard let image = context.makeImage() else { return nil }
+        
+        return image
     }
     
     func makeCursor(size: CGSize) -> CGImage? {

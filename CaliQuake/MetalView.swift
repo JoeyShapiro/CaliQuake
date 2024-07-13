@@ -58,6 +58,7 @@ struct MetalView: NSViewRepresentable {
     func updateNSView(_ nsView: MTKView, context: Context) {
         // Handle updates if necessary
         self.coordinator.update(grid: self.grid, debug: self.debug)
+        self.grid.update(debug: self.debug)
     }
 }
 
