@@ -59,28 +59,32 @@ struct CaliQuakeApp: App {
     
     var body: some Scene {
         WindowGroup {
+            Text("icon: \(self.grid.icon)")
+            Text("name: \(self.grid.name)")
+            Text("title: \(self.grid.title)")
+            Text("pwd: \(self.grid.pwd)")
             // TODO best i can do for now
             Button("symbol", systemImage: symbol) {
                 symbol = symbol == "water.waves" ? "water.waves.slash" : "water.waves"
 //                    .symbolEffect(.bounce.up.byLayer, value: effect)
             }
-            ZStack {
-                MetalView(grid: $grid, pointSize: self.font.pointSize, debug: $isDebug, rows: self.rows, cols: self.cols)
-                    .frame(width: (7 * CGFloat(self.cols) ), height: (14 * CGFloat(self.rows)))
-                    .padding(5)
-                    .background(Color.black)
-//                    .frame(width: (font.pointSize * CGFloat(self.cols) / fontRatio ), height: (font.pointSize * fontHuh * CGFloat(self.rows)))
-                    .onAppear() {
-                        if pty == nil {
-                            startTTY()
-                        }
-                    }
-                // getting the location causes a re-init
-                PopView(grid: $grid, pointSize: font.pointSize, debug: $isDebug, width: self.width, height: self.height)
-                //                .alert("Important message", isPresented: $show) {
-                //                    Button("OK") { }
-                //                }
-            }
+//            ZStack {
+//                MetalView(grid: $grid, pointSize: self.font.pointSize, debug: $isDebug, rows: self.rows, cols: self.cols)
+//                    .frame(width: (7 * CGFloat(self.cols) ), height: (14 * CGFloat(self.rows)))
+//                    .padding(5)
+//                    .background(Color.black)
+////                    .frame(width: (font.pointSize * CGFloat(self.cols) / fontRatio ), height: (font.pointSize * fontHuh * CGFloat(self.rows)))
+//                    .onAppear() {
+//                        if pty == nil {
+//                            startTTY()
+//                        }
+//                    }
+//                // getting the location causes a re-init
+//                PopView(grid: $grid, pointSize: font.pointSize, debug: $isDebug, width: self.width, height: self.height)
+//                //                .alert("Important message", isPresented: $show) {
+//                //                    Button("OK") { }
+//                //                }
+//            }
         }
         .modelContainer(sharedModelContainer)
         MenuBarExtra {
@@ -115,7 +119,7 @@ struct CaliQuakeApp: App {
                                 return .handled
                             } else if keyPress.modifiers.contains(.control) && keyPress.characters == "c" {
                                 command += String(bytes: [3], encoding: .utf8)! // ctrl-c
-                                let n = pty!.write(command: command)
+                                let _ = pty!.write(command: command)
                                 command = ""
                                 return .handled
                             }
@@ -157,8 +161,13 @@ struct CaliQuakeApp: App {
                             
                             return .handled
                         })
+                        .onAppear() {
+                            if pty == nil {
+                                startTTY()
+                            }
+                        }
         } label: {
-            Image(systemName: symbol)
+            Image(systemName: self.grid.busy() ? "water.waves.slash" : "water.waves")
         }.menuBarExtraStyle(.window)
     }
     

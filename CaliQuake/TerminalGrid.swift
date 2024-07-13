@@ -18,6 +18,10 @@ struct TerminalGrid: Sequence {
     private var rows: Int
     public var top: Int
     private var debug: Bool
+    public var title: String
+    public var name: String
+    public var icon: String
+    public var pwd: String
     
     init(cols: Int, rows: Int) {
         self.text = []
@@ -28,6 +32,10 @@ struct TerminalGrid: Sequence {
         self.rows = rows
         
         self.debug = false
+        self.title = ""
+        self.name = ""
+        self.icon = ""
+        self.pwd = ""
     }
     
     mutating func update(debug: Bool) {
@@ -96,6 +104,28 @@ struct TerminalGrid: Sequence {
         curChar = AnsiChar(x: 0, y: 0)
         
         self.top = topRow()
+    }
+    
+    func busy() -> Bool {
+        let fileManager = FileManager.default
+        
+        // Expand the path
+        var path = (self.name as NSString).expandingTildeInPath
+        if !path.starts(with: "/") && !path.starts(with: "./") {
+            path = fileManager.which(path) ?? ""
+        }
+        
+        // if its a file, we are running a command
+        do {
+            let attributes = try fileManager.attributesOfItem(atPath: path)
+            if attributes[.type] as? FileAttributeType == .typeDirectory {
+                return false
+            } else {
+                return true
+            }
+        } catch {
+            return false
+        }
     }
     
     private mutating func parse(_ stdout: Data) -> [AnsiChar] {
@@ -247,7 +277,7 @@ struct TerminalGrid: Sequence {
             // its doing the auto complete, so i have to handle escapes now
             
             // shrug
-            if (isMeta || osc) && stdout[i] == bel {
+            if isMeta && stdout[i] == bel {
                 isEsc = false
                 isMeta = false
                 csi = false
@@ -376,6 +406,39 @@ struct TerminalGrid: Sequence {
                         print("default J")
                     }
                 }
+            } else if isEsc && !isMeta && osc {
+                var code = Data()
+                // get the number
+                while stdout[i] != 59 /* ; */ {
+                    code.append(stdout[i])
+                    i += 1
+                }
+                i += 1 // ";"
+                var data = Data()
+                while i < stdout.count && stdout[i] != bel && stdout[i] != 92 /* \ (ST) */ {
+                    data.append(stdout[i])
+                    i += 1
+                }
+                // read what is there
+                if let n = Int(String(data: code, encoding: .utf8)!) {
+                    switch n {
+                    case 0: // set icon name
+                        self.icon = String(data: data, encoding: .utf8)!
+                    case 1: // set icon (title) name (maybe)
+                        self.name = String(data: data, encoding: .utf8)!
+                    case 2: // set window title
+                        self.title = String(data: data, encoding: .utf8)!
+                    case 7: // current working directory
+                        self.pwd = String(data: data, encoding: .utf8)!
+                    default:
+                        let shrug = String(data: data, encoding: .utf8)!
+                        print("unknown osc", n, shrug.debugDescription)
+                    }
+                }
+                
+                isEsc = false
+                osc = false
+                sequence.removeAll()
             }
             
             i+=1
@@ -535,5 +598,27 @@ extension NSFont {
             return self
         }
         return newFont
+    }
+}
+
+extension FileManager {
+    func which(_ file: String) -> String? {
+        // Get the PATH environment variable
+        guard let pathEnv = ProcessInfo.processInfo.environment["PATH"] else {
+            return nil
+        }
+        
+        // Split the PATH into individual directories
+        let paths = pathEnv.split(separator: ":")
+        
+        // Search for the executable in each directory
+        for path in paths {
+            let fullPath = (path as NSString).appendingPathComponent(file)
+            if self.isExecutableFile(atPath: fullPath) {
+                return fullPath
+            }
+        }
+        
+        return nil
     }
 }
