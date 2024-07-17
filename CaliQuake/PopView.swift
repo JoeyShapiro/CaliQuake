@@ -49,7 +49,7 @@ struct PopView: View {
                             .onEnded { value in
                                 popPos = value.location
     #if DEBUG
-                                if let ac = self.grid.ch(at: popPos) {
+                                if let (ac, _) = self.grid.ch(at: popPos) {
                                     popAC = ac
                                     visible = true
                                 } else {

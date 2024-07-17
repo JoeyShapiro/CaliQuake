@@ -22,6 +22,7 @@ struct TerminalGrid: Sequence {
     public var name: String
     public var icon: String
     public var pwd: String
+    public var highlighted: [AnsiChar]
     
     init(cols: Int, rows: Int) {
         self.text = []
@@ -36,6 +37,7 @@ struct TerminalGrid: Sequence {
         self.name = ""
         self.icon = ""
         self.pwd = ""
+        self.highlighted = []
     }
     
     mutating func update(debug: Bool) {
@@ -72,34 +74,43 @@ struct TerminalGrid: Sequence {
         self.top = topRow()
     }
     
-    func ch(at: CGPoint) -> AnsiChar? {
+    func ch(at: CGPoint) -> (AnsiChar, Int)? {
         let x = Int(at.x / 7)
         let y = Int(at.y / 14)
         // last is better, it will show what is on top. but it should show all
-        let ac = self.text.last(where: { ac in
+        guard let i = self.text.lastIndex(where: { ac in
             return ac.x == x && ac.y-top == y
-        })
-            
-        return ac
+        }) else {
+            return nil
+        }
+        
+        // they are valid
+        return (self.text[i], i)
     }
     
-    func highlight(start: CGPoint, end: CGPoint) -> [CGRect] {
-        guard let acStart = self.ch(at: start),
-           let acEnd = self.ch(at: end) else {
+    // TODO could update a state with this, then draw it on extra
+    mutating func highlight(start: CGPoint, end: CGPoint) -> [CGRect] {
+        self.highlighted = []
+        
+        guard let (acStart, si) = self.ch(at: start),
+              let (acEnd, ei) = self.ch(at: end) else {
             return []
         }
         
         let acs = [ acStart, acEnd ]
+        let idxs = [ si, ei ].sorted { return $0 < $1 }
         let xs = acs.map { $0.x }.sorted { return $0 < $1 }
         let ys = acs.map { $0.y }.sorted { return $0 < $1 }
         
         var highlights = [CGRect]()
         for x in xs[0]...xs[1] {
             for y in ys[0]...ys[1] {
-                print("(\(x), \(y))")
                 highlights.append(CGRect(x: x*7, y: y*14, width: 7, height: 14))
             }
         }
+        
+        // best way to get all the highlighted stuff, rather than checking later with isHighlighted
+        self.highlighted = Array(self.text[ idxs[0] ... idxs[1] ])
         
         return highlights
     }
