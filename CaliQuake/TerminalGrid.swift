@@ -17,7 +17,7 @@ struct TerminalGrid: Sequence {
     private var cols: Int
     private var rows: Int
     public var top: Int
-    private var debug: Bool
+    public var debug: Bool
     public var title: String
     public var name: String
     public var icon: String
@@ -81,6 +81,27 @@ struct TerminalGrid: Sequence {
         })
             
         return ac
+    }
+    
+    func highlight(start: CGPoint, end: CGPoint) -> [CGRect] {
+        guard let acStart = self.ch(at: start),
+           let acEnd = self.ch(at: end) else {
+            return []
+        }
+        
+        let acs = [ acStart, acEnd ]
+        let xs = acs.map { $0.x }.sorted { return $0 < $1 }
+        let ys = acs.map { $0.y }.sorted { return $0 < $1 }
+        
+        var highlights = [CGRect]()
+        for x in xs[0]...xs[1] {
+            for y in ys[0]...ys[1] {
+                print("(\(x), \(y))")
+                highlights.append(CGRect(x: x*7, y: y*14, width: 7, height: 14))
+            }
+        }
+        
+        return highlights
     }
     
     func curx() -> Int {

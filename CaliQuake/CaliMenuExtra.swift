@@ -23,6 +23,7 @@ struct CaliMenuExtra: View {
         ZStack {
             Image(self.grid.makeImage(size: self.size, pointSize: 12)!, scale: 2.0, label: Text("text"))
             Image(self.grid.makeCursor(size: self.size)!, scale: 2.0, label: Text("cursor"))
+            PopView(grid: $grid, pointSize: 12, width: self.size.width, height: self.size.height)
         }
     }
 }
