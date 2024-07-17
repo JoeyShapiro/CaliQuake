@@ -34,7 +34,7 @@ struct PopView: View {
         ZStack {
             ForEach(Array(highlights.enumerated()), id: \.offset) { index, rect in
                 Rectangle()
-                    .background(Color.accentColor.opacity(0.5))
+                    .fill(Color.accentColor.opacity(0.5))
                     .frame(width: rect.width, height: rect.height)
                     .position(x: rect.midX, y: rect.midY)
             }
